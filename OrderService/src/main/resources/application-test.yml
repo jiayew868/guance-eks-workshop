@@ -1,0 +1,16 @@
+## java -jar spring-boot.jar --spring.profiles.active=prod
+##  scheduledtime 1000 * 60 * 5
+
+server:
+  port: 8082
+
+spring:
+  application:
+    name: order-service
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        file-extension: properties
+        server-addr: 127.0.0.1:8848
+

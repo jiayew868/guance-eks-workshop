@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration status="off" monitorInterval="1800">
+    <properties>
+        <Property name="LOG_HOME">${sys:log.home:-logs}</Property>
+        <property name="containerId">${docker:containerId:-containerId}</property>
+        <property name="containerName">${docker:containerName:-containerName}</property>
+        <property name="imageName">${docker:imageName:-imageName}</property>
+
+        <property name="ERROR_LOG_FILE_NAME">${LOG_HOME}/error-${containerId}</property>
+        <property name="WARN_LOG_FILE_NAME">${LOG_HOME}/warn-${containerId}</property>
+        <property name="INFO_LOG_FILE_NAME">${LOG_HOME}/info-${containerId}</property>
+        <property name="DEBUG_LOG_FILE_NAME">${LOG_HOME}/debug-${containerId}</property>
+
+        <property name="PATTERN">containerId ${containerId}-[%d{yyyy-MM-dd HH:mm:ss}] [%t] %-5p [%c] %L - %m%n</property>
+    </properties>
+
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--只接受程序中DEBUG级别的日志进行处理, 下同 -->
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${PATTERN}"/>
+        </Console>
+        <RollingFile fileName="${DEBUG_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/debug-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileDebug">
+            <Filters>
+                <ThresholdFilter level="DEBUG"/>
+                <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <!-- max:同一文件夹下最多文件数 -->
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_HOME}" maxDepth="2">
+                    <IfFileName glob="*/debug*">
+                        <!-- 保存天数 -->
+                        <IfLastModified age="10d">
+                            <IfAny>
+                                <IfAccumulatedFileSize exceeds="100 MB"/>
+                                <IfAccumulatedFileCount exceeds="10"/>
+                            </IfAny>
+                        </IfLastModified>
+                    </IfFileName>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile fileName="${INFO_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileInfo">
+            <Filters>
+                <ThresholdFilter level="INFO"/>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+        <RollingFile fileName="${WARN_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileWarn">
+            <Filters>
+                <ThresholdFilter level="WARN"/>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+        <RollingFile fileName="${ERROR_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileError">
+            <ThresholdFilter level="ERROR"/>
+            <PatternLayout pattern="${PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+    </appenders>
+    <loggers>
+        <root level="debug" includeLocation="true">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="RollingFileInfo"/>
+            <appender-ref ref="RollingFileWarn"/>
+            <appender-ref ref="RollingFileError"/>
+            <appender-ref ref="RollingFileDebug"/>
+        </root>
+    </loggers>
+</Configuration>

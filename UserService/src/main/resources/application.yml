@@ -1,0 +1,33 @@
+## java -jar spring-boot.jar --spring.profiles.active=prod
+##  scheduledtime 1000 * 60 * 5
+
+logging:
+    level:
+        org.springframework.web: INFO
+        com.hofang.wx: info
+        me.chanjar.weixin: info
+
+wechat:
+  cp:
+    corpId: wwaf8c7eb2e6e40bd1
+    msgAppId: 1000002
+    scheduledtime: 300000
+    node: 01
+    appConfigs:
+      - agentId: 1000002
+        secret: hhDaKKx4zw44L6h_G3SMV-LZ1IeJx38SHnCRoCASAdM
+
+server:
+  port: 8081
+spring:
+    profiles: prod
+    datasource:
+        url: jdbc:mysql://database-1.cjro09yqwra4.rds.cn-northwest-1.amazonaws.com.cn:3306/hofangdb?useSSL=false
+        driverClassName: com.mysql.cj.jdbc.Driver
+        username: admin
+        password: 12345678
+        hikari:
+            maximum-pool-size: 5
+mybatis-plus:
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
