@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: user-service
   namespace: nacosdemo
   labels:
-    app: order-service
+    app: user-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: user-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: user-service
     spec:
       containers:
-        - name: order-service
-          image: 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/order_service:latest
+        - name: user-service
+          image: 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/user_service:latest
           ports:
-            - containerPort: 8082
+            - containerPort: 8081
           resources:
             limits:
               memory: "512Mi"

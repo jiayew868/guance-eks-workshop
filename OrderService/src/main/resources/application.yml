@@ -1,20 +1,33 @@
 ## java -jar spring-boot.jar --spring.profiles.active=prod
 ##  scheduledtime 1000 * 60 * 5
 
-
 server:
-  port: 8081
-
+  port: 8082
 spring:
   application:
-    name: user-service
+    name: order-service
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        register-enabled: true
+        group: demo
+      config:
+        enabled: false
+        file-extension: properties
+        server-addr: 127.0.0.1:8848
+        group: demo
 
-#nacos:
-#  config:
-#    server-addr: 127.0.0.1:8848
-#    context-path: nacos
-#    data-id: user-svr
-#    auto-refresh: true
-#    bootstrap:
-#      enable: true
+
+
+
+
+
+
+
+
+
+
+
 

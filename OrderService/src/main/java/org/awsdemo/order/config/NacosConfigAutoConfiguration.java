@@ -1,7 +1,6 @@
-package org.awsdemo.config;
+package org.awsdemo.order.config;
 
 
-import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration

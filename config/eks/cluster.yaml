@@ -1,0 +1,54 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+vpc:
+  id: "vpc-007a957cbd15fead9"
+  subnets:
+    private:
+      cn-northwest-1a: { id: subnet-0d4a3555440205203 }
+      cn-northwest-1b: { id: subnet-0cfd4a305e6d68b68 }
+    public:
+      cn-northwest-1a: { id: subnet-03275706fdd1badad }
+      cn-northwest-1b: { id: subnet-061b17a839a60623c }
+
+metadata:
+  name: eks-workshop02
+  region: cn-northwest-1
+  version: '1.25'
+
+managedNodeGroups:
+  - name: managed-ng-1
+    instanceType: t2.large
+    desiredCapacity: 1
+    maxSize: 2
+    ssh:
+      allow: true
+      publicKeyName: lx-kevin-01
+    privateNetworking: true
+  - name: managed-ng-2
+    instanceType: m5.xlarge
+    desiredCapacity: 1
+    volumeSize: 100
+    ssh:
+      allow: true
+      publicKeyName: lx-kevin-01
+    privateNetworking: true
+
+fargateProfiles:
+  - name: default
+    selectors:
+      - namespace: default
+        labels:
+          env: fargate
+  - name: game2048
+    selectors:
+      - namespace: game-2048
+        labels:
+          env: fargate
+  - namespace: kube-system
+
+
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]
+    logRetentionInDays: 7

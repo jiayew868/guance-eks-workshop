@@ -1,4 +1,4 @@
-package org.awsdemo.order.controller;
+package org.awsdemo.user.controller;
 
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.RequestMapping;

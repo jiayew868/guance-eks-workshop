@@ -3,6 +3,8 @@ kind: StatefulSet
 metadata:
   name: {{ include "nacos.fullname" . }}
   namespace: {{ .Values.namespace }}
+  labels:
+    env: fargate
   annotations:
   {{- toYaml .Values.annotations | indent 4 }}
 spec:
@@ -26,6 +28,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "nacos.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        env: fargate
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -40,6 +43,7 @@ spec:
       {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if and (eq .Values.global.mode "cluster") (.Values.nacos.plugin.enable) }}
+
       initContainers:
         - name: peer-finder-plugin-install
           image: {{.Values.nacos.plugin.image.repository}}:{{.Values.nacos.plugin.image.tag}}
@@ -88,6 +92,13 @@ spec:
               value: {{ .Values.nacos.serverPort | quote }}
             - name: PREFER_HOST_MODE
               value: {{ .Values.nacos.preferhostmode | quote }}
+            - name: NACOS_AUTH_IDENTITY_KEY
+              value: "nacos_key"
+            - name: NACOS_AUTH_IDENTITY_VALUE
+              value: "nacos_key_value"
+            - name: NACOS_AUTH_TOKEN
+              value: "SecretKey012345678901234567890123456789012345678901234567890123456789"
+
             {{- if eq .Values.global.mode "standalone" }}
             - name: MODE
               value: "standalone"
