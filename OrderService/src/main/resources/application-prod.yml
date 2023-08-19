@@ -16,3 +16,9 @@ spring:
         enabled: true
         file-extension: properties
         server-addr: 192.168.31.12:8848
+
+logging:
+  file:
+    path: /var/log/awsdemo/order-service
+
+

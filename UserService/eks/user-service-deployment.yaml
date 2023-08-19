@@ -46,7 +46,7 @@ spec:
 
           volumeMounts:
             - name: log-path
-              mountPath: /awsdemo
+              mountPath: /var/log/
       volumes:
         - name: log-path
           hostPath:

@@ -29,8 +29,8 @@ public class OrderService {
 
 
     @GetMapping("/version")
-    public String hello () {
-        String value = String.format("version %s" , this.appVersion);
+    public String hello() {
+        String value = String.format("version %s", this.appVersion);
 
         logger.debug("debug This is a debug message.");
         logger.info("info This is an info message.");
@@ -40,7 +40,7 @@ public class OrderService {
     }
 
     @GetMapping("/list/userid/{userid}")
-    public List<Order> orders(@PathVariable("userid") String userId){
+    public List<Order> orders(@PathVariable("userid") String userId) {
 
         List<Order> values = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

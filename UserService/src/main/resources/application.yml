@@ -27,4 +27,7 @@ spring:
 #    auto-refresh: true
 #    bootstrap:
 #      enable: true
+logging:
+  file:
+    path: ./logs/awsdemo/${spring.application.name}
 

@@ -11,7 +11,7 @@ VOLUME /app/logs
 # 设置环境变量
 ENV envir=""
 ENV JAVA_OPTS=""
-ENV log_env=""
+ENV LOG_PATH=""
 
 # 设置构建参数
 ARG JAR_FILE
@@ -23,4 +23,6 @@ COPY target/${JAR_FILE} app.jar
 EXPOSE 8082
 # 设置容器启动命令
 
-ENTRYPOINT ["sh","-c","java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS -jar app.jar --spring.profiles.active=$envirv $log_env"]
+ENTRYPOINT ["sh",
+            "-c",
+            "java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS -jar app.jar --spring.profiles.active=$envir --logging.file.path=$LOG_PATH"]

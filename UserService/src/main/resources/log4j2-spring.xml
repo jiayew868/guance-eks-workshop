@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Configuration status="off" monitorInterval="1800">
     <properties>
-        <Property name="LOG_HOME">${sys:log.home:-logs}</Property>
+<!--        <Property name="LOG_HOME">${sys:log.home:-logs}</Property>-->
+        <Property name="LOG_HOME">${sys:LOG_PATH:-logs}</Property>
         <property name="project.name">user-service</property>
         <property name="ERROR_LOG_FILE_NAME">${LOG_HOME}/error/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>
         <property name="WARN_LOG_FILE_NAME">${LOG_HOME}/warn/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>
@@ -17,7 +18,7 @@
             <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${PATTERN}"/>
         </Console>
-        <RollingFile fileName="${DEBUG_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/debug-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileDebug">
+        <RollingFile fileName="${DEBUG_LOG_FILE_NAME}.log" filePattern="${LOG_HOME}/logs/${project.name}/$${date:yyyy-MM}/debug-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileDebug">
             <Filters>
                 <ThresholdFilter level="DEBUG"/>
                 <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
@@ -42,7 +43,7 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-        <RollingFile fileName="${INFO_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileInfo">
+        <RollingFile fileName="${INFO_LOG_FILE_NAME}.log" filePattern="${LOG_HOME}/logs/${project.name}/${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileInfo">
             <Filters>
                 <ThresholdFilter level="INFO"/>
                 <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
@@ -53,7 +54,7 @@
                 <TimeBasedTriggeringPolicy/>
             </Policies>
         </RollingFile>
-        <RollingFile fileName="${WARN_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileWarn">
+        <RollingFile fileName="${WARN_LOG_FILE_NAME}.log" filePattern="${LOG_HOME}/logs/${project.name}/${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileWarn">
             <Filters>
                 <ThresholdFilter level="WARN"/>
                 <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
@@ -64,7 +65,7 @@
                 <TimeBasedTriggeringPolicy/>
             </Policies>
         </RollingFile>
-        <RollingFile fileName="${ERROR_LOG_FILE_NAME}.log" filePattern="logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileError">
+        <RollingFile fileName="${ERROR_LOG_FILE_NAME}.log" filePattern="${LOG_HOME}/logs/${project.name}/${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz" name="RollingFileError">
             <ThresholdFilter level="ERROR"/>
             <PatternLayout pattern="${PATTERN}"/>
             <Policies>

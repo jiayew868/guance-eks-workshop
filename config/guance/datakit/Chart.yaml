@@ -1,0 +1,26 @@
+annotations:
+  catalog.cattle.io/certified: partner
+  catalog.cattle.io/display-name: DataKit
+  catalog.cattle.io/release-name: datakit
+apiVersion: v2
+appVersion: 1.13.1
+dependencies:
+- condition: kubeStateMetricsEnabled
+  name: kube-state-metrics
+  repository: file://./charts/kube-state-metrics
+- condition: MetricsServerEnabled
+  name: metrics-server
+  repository: file://./charts/metrics-server
+description: Chart for the DaemonSet DataKit
+home: http://www.guance.com
+icon: https://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/images/datakit/datakit-icon-white-bg.png
+keywords:
+- Observable
+maintainers:
+- email: tanbiao@jiagouyun.com
+  name: coanor
+name: datakit
+sources:
+- https://github.com/GuanceCloud/datakit
+type: application
+version: 1.13.1

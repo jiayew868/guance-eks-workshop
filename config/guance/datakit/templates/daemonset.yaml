@@ -1,0 +1,194 @@
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: {{ include "datakit.fullname" . }}
+  {{- include "datakit.labels" . | nindent 4 }}
+  name: {{ include "datakit.fullname" . }}
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+  {{- include "datakit.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ randAlphaNum 5 | quote }}
+      {{- with .Values.podAnnotations }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ include "datakit.fullname" . }}
+    {{- include "datakit.selectorLabels" . | nindent 8 }}
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+            - name: ENV_K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: ENV_DATAWAY
+              value: {{ .Values.datakit.dataway_url }}
+            - name: ENV_GLOBAL_TAGS
+              value: {{ .Values.datakit.global_tags }}
+            - name: ENV_DEFAULT_ENABLED_INPUTS
+              value: {{ .Values.datakit.default_enabled_inputs }}
+            - name: ENV_ENABLE_ELECTION
+              value: {{ .Values.datakit.enabled_election | quote }}
+            - name: ENV_LOG_LEVEL
+              value: {{ .Values.datakit.log_level }}
+            - name: ENV_HTTP_LISTEN
+              value: {{ .Values.datakit.http_listen }}
+            - name: HOST_PROC
+              value: /rootfs/proc
+            - name: HOST_SYS
+              value: /rootfs/sys
+            - name: HOST_ETC
+              value: /rootfs/etc
+            - name: HOST_VAR
+              value: /rootfs/var
+            - name: HOST_RUN
+              value: /rootfs/run
+            - name: HOST_DEV
+              value: /rootfs/dev
+            - name: HOST_ROOT
+              value: /rootfs
+            {{- if .Values.iploc.enable }}
+            - name: ENV_IPDB
+              value: iploc
+            {{- end }}
+            {{- if .Values.git_repos.enable }}
+            {{- if not (eq  "-" .Values.git_repos.git_url) }}
+            - name: ENV_GIT_URL
+              value: {{ .Values.git_repos.git_url }}
+            {{- end }}
+            {{- if not (eq "-" .Values.git_repos.git_key_path ) }}
+            - name: ENV_GIT_KEY_PATH
+              value: "/usr/local/datakit/id_rsa"
+            {{- end }}
+            {{- if not (eq .Values.git_repos.git_key_pw "-") }}
+            - name: ENV_GIT_KEY_PW
+              value: {{ .Values.git_repos.git_key_pw | quote  }}
+            {{- end }}
+            - name: ENV_GIT_BRANCH
+              value: {{ .Values.git_repos.git_branch | quote }}
+            - name: ENV_GIT_INTERVAL
+              value: {{ .Values.git_repos.git_interval | quote  }}
+            {{- end }}
+            {{- if .Values.extraEnvs }}
+            {{- range .Values.extraEnvs }}
+            {{- with . }}
+            - name : {{ .name }}
+              value : {{ .value | quote }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: {{ .Chart.Name }}
+          ports:
+            - containerPort: 9529
+              hostPort: 9529
+              name: port
+              protocol: TCP
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /var/run
+              name: run
+            - mountPath: /rootfs
+              name: rootfs
+            - mountPath: /sys/kernel/debug
+              name: debugfs
+            - mountPath: /usr/local/datakit/cache
+              name: cache
+              readOnly: false
+            {{- if .Values.iploc.enable }}
+            - mountPath: /usr/local/datakit/data/ipdb/iploc/
+              name: datakit-ipdb
+            {{- end }}
+            {{- if .Values.git_repos.enable }}
+            {{- if not (eq .Values.git_repos.git_key_path "-") }}
+            - mountPath: /usr/local/datakit/id_rsa
+              name: id-rsa
+              subPath: id_rsa
+            {{- end }}
+            {{- end }}
+            {{- if .Values.dkconfig }}
+            {{- range $index, $vaule := .Values.dkconfig }}
+            {{- with $vaule }}
+            - mountPath: {{ .path }}
+              name: datakit-conf
+              subPath: {{ .name }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          workingDir: /usr/local/datakit
+      hostIPC: true
+      hostPID: true
+      restartPolicy: Always
+      {{- if .Values.iploc.enable }}
+      initContainers:
+        - args:
+            - tar -xf /opt/iploc.tar.gz -C /usr/local/datakit/data/ipdb/iploc/
+          command:
+            - bash
+            - -c
+          image: {{ .Values.iploc.image.repository }}:{{ .Values.iploc.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: IfNotPresent
+          name: init-volume
+          resources: {}
+          volumeMounts:
+            - mountPath: /usr/local/datakit/data/ipdb/iploc/
+              name: datakit-ipdb
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{ toYaml . | indent 6 }}
+      {{- end }}
+      serviceAccount: {{ include "datakit.fullname" . }}
+      serviceAccountName: {{ include "datakit.fullname" . }}
+      volumes:
+        - hostPath:
+            path: /var/run
+          name: run
+        - hostPath:
+            path: /
+          name: rootfs
+        - hostPath:
+            path: /root/datakit_cache
+          name: cache
+        - hostPath:
+            path: /sys/kernel/debug
+          name: debugfs
+        {{- if .Values.iploc.enable }}
+        - emptyDir: {}
+          name: datakit-ipdb
+        {{- end }}
+        {{- if .Values.git_repos.enable }}
+        {{- if not (eq .Values.git_repos.git_key_path "-") }}
+        - configMap:
+            name: id-rsa
+          name: id-rsa
+        {{- end }}
+        {{- end }}
+        {{- if .Values.dkconfig }}
+        - configMap:
+            name: datakit-conf
+          name: datakit-conf
+        {{- end }}
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate

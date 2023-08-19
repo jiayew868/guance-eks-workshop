@@ -14,4 +14,5 @@ data:
   ##JAVA_OPTS2: "-Xms512m -Xmx1g"
   JAVA_OPTS: "-Dspring.cloud.nacos.config.server-addr=nacos-cs.default.svc.cluster.local:8848 -Dspring.cloud.nacos.discovery.server-addr=nacos-cs.default.svc.cluster.local:8848"
   envir: "prod"
-  
+  LOG_PATH: "/var/log/awsdemo/"
+
