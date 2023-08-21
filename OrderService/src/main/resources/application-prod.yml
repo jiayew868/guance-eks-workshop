@@ -19,6 +19,6 @@ spring:
 
 logging:
   file:
-    path: /var/log/awsdemo/order-service
+    path: /var/log/awsdemo/${spring.application.name}
 
 

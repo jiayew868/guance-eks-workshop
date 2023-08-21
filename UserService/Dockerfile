@@ -9,18 +9,21 @@ VOLUME /tmp
 VOLUME /app/logs
 
 # 设置环境变量
+ENV LOG_PATH=""
 ENV envir=""
 ENV JAVA_OPTS=""
-ENV LOG_PATH=""
+ENV DD_AGENT=""
 
 # 设置构建参数
 ARG JAR_FILE
 
+COPY ["../libs/dd-java-agent-1.19.1.jar","/usr/dd-java-agent/agent/"]
+
 # 复制jar文件到容器中
-COPY target/${JAR_FILE} app.jar
+COPY /UserService/target/${JAR_FILE} app.jar
 
 # 声明需要暴露的端口
 EXPOSE 8082
 # 设置容器启动命令
 
-ENTRYPOINT ["sh","-c","java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS -jar app.jar --spring.profiles.active=$envir --logging.file.path=$LOG_PATH"]
+ENTRYPOINT ["sh","-c","java -Djava.security.egd=file:/dev/./urandom $DD_AGENT $JAVA_OPTS -Ddd.service=user-service -jar app.jar --logging.file.path=$LOG_PATH ${PARAMS} --spring.profiles.active=$envir ${PARAMS}  2>&1 > /dev/null"]

@@ -43,11 +43,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: nacosdemo-config
-
           volumeMounts:
             - name: log-path
-              mountPath: /var/log/awsdemo
+              mountPath: /var/log/
       volumes:
         - name: log-path
           hostPath:
-            path: /var/log/awsdemo
+            path: /var/log/

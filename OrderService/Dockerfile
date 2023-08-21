@@ -23,6 +23,4 @@ COPY target/${JAR_FILE} app.jar
 EXPOSE 8082
 # 设置容器启动命令
 
-ENTRYPOINT ["sh",
-            "-c",
-            "java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS -jar app.jar --spring.profiles.active=$envir --logging.file.path=$LOG_PATH"]
+ENTRYPOINT ["sh","-c","java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS -Ddd.service=order-service -jar app.jar --logging.file.path=$LOG_PATH --spring.profiles.active=$envir"]

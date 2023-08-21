@@ -2,7 +2,7 @@
 <Configuration status="off" monitorInterval="1800">
     <properties>
 <!--        <Property name="LOG_HOME">${sys:log.home:-logs}</Property>-->
-        <Property name="LOG_HOME">${sys:LOG_PATH:-logs}</Property>
+        <Property name="LOG_HOME">${sys:logging.file.path:-logs}</Property>
         <property name="project.name">user-service</property>
         <property name="ERROR_LOG_FILE_NAME">${LOG_HOME}/error/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>
         <property name="WARN_LOG_FILE_NAME">${LOG_HOME}/warn/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>

@@ -21,7 +21,7 @@ spring:
 
 logging:
   file:
-    path: ./logs
+    path: ./logs/awsdemo/${spring.application.name}
 
 
 
