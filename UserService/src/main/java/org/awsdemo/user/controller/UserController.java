@@ -2,6 +2,8 @@ package org.awsdemo.user.controller;
 
 
 import com.alibaba.nacos.api.config.annotation.NacosValue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.awsdemo.core.entity.Order;
 import org.awsdemo.core.entity.User;
 import org.awsdemo.user.entity.UserOrder;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
+    private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Autowired
     private RestTemplate restTemplate;
