@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="accountSettings">
-    <option name="activeProfile" value="profile:sg" />
-    <option name="activeRegion" value="ap-southeast-1" />
+    <option name="activeProfile" value="profile:zhy" />
+    <option name="activeRegion" value="cn-northwest-1" />
     <option name="recentlyUsedProfiles">
       <list>
-        <option value="profile:sg" />
         <option value="profile:zhy" />
+        <option value="profile:sg" />
         <option value="profile:default" />
       </list>
     </option>
     <option name="recentlyUsedRegions">
       <list>
+        <option value="cn-northwest-1" />
         <option value="ap-southeast-1" />
         <option value="us-west-1" />
         <option value="us-east-1" />
-        <option value="cn-northwest-1" />
       </list>
     </option>
-  </component>
-  <component name="connectionManager">
-    <option name="activeConnectionId" value="sso;us-east-1;https://view.awsapps.com/start" />
   </component>
 </project>

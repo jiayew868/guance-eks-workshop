@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: order-service
+      annotations:
+        admission.datakit/java-lib.version: ""
     spec:
       containers:
         - name: order-service
@@ -40,6 +42,11 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: DD_OPTS
+            value: -Ddd.env=prod -Ddd.service=order-service 
+                    -Ddd.jmxfetch.enabled=true -Ddd.jmxfetch.check-period=1000 
+                    -Ddd.jmxfetch.statsd.port=8125 -Ddd.profiling.enabled=true 
+                    -Ddd.profiling.allocation.enabled=true -Duser.timezone=GMT+8
           envFrom:
             - configMapRef:
                 name: nacosdemo-config

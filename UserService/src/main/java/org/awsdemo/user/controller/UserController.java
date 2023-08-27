@@ -32,6 +32,7 @@ public class UserController {
     @GetMapping("/hello")
     public String hello () {
         String value = String.format("%s,%s" , "user","1111");
+        logger.info(value);
         return value;
     }
 
@@ -43,10 +44,9 @@ public class UserController {
 
     @GetMapping(value = "/{userid}/user_orders")
     public UserOrder userOrder(@PathVariable("userid") String userId){
-
+        logger.info("userOrder -- start");
         User user = new User();
         user.setUserId(userId);
-
         ResponseEntity<Order[]> responseEntity = restTemplate.getForEntity("http://order-service/order/list/userid/"+ userId, Order[].class);
         Order[] orderArray = responseEntity.getBody();
         List<Order> orders = new ArrayList<>();
@@ -55,6 +55,7 @@ public class UserController {
         }
 
        UserOrder userOrder = new UserOrder(user,orders);
+        logger.info("userOrder -- end");
        return userOrder;
     }
 

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Configuration status="off" monitorInterval="1800">
     <properties>
-        <Property name="LOG_HOME">${sys:LOG_PATH}</Property>
-<!--        <Property name="LOG_HOME">${sys:logging.file.path:-logs}</Property>-->
+        <Property name="LOG_HOME">${sys:LOG_PATH:-logs}</Property>
         <property name="project.name">user-service</property>
         <property name="ERROR_LOG_FILE_NAME">${LOG_HOME}/error/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>
         <property name="WARN_LOG_FILE_NAME">${LOG_HOME}/warn/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>
         <property name="INFO_LOG_FILE_NAME">${LOG_HOME}/info/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>
         <property name="DEBUG_LOG_FILE_NAME">${LOG_HOME}/debug/#${project.name}#${env:MY_NODE_NAME}#${env:MY_POD_NAMESPACE}#${env:MY_POD_NAME}</property>
-<!--        <property name="PATTERN">[%d{yyyy-MM-dd HH:mm:ss}] [%t] %-5p [%c] %L - %m%n</property>-->
-        <property name="PATTERN">%d{yyyy-MM-dd HH:mm:ss}:${project.name} %p %t [%F:%L] - %m%n</property>
+        <property name="PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] %X{dd.service} %X{dd.trace_id} %X{dd.span_id} - %msg%n</property>
     </properties>
 
     <appenders>

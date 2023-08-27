@@ -17,6 +17,6 @@ spring:
         file-extension: properties
         server-addr:  192.168.16.166:8848
 
-logging:
-  file:
-    path: ./logs/awsdemo/${spring.application.name}
+#logging:
+#  file:
+#    path: ./logs/awsdemo/${spring.application.name}

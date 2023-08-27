@@ -12,16 +12,16 @@ spring:
         enabled: true
         server-addr: 127.0.0.1:8848
         register-enabled: true
-        group: demo
+
       config:
-        enabled: false
+        enabled: true
         file-extension: properties
         server-addr: 127.0.0.1:8848
-        group: demo
 
-logging:
-  file:
-    path: ./logs/awsdemo/${spring.application.name}
+
+#logging:
+#  file:
+#    path: ./logs/awsdemo/${spring.application.name}
 
 
 
