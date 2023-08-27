@@ -1,0 +1,123 @@
+## Datakit-Operator v1.3.0 Configuration YAML
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datakit-operator
+  namespace: datakit
+spec:
+  selector:
+    app: datakit-operator
+  ports:
+    - name: http
+      port: 443
+      targetPort: 9543
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datakit-operator-config
+  namespace: datakit
+data:
+  jsonconfig: |-
+    {
+        "server_listen": "0.0.0.0:9543",
+        "log_level":     "info",
+        "admission_inject": {
+            "ddtrace": {
+                "images": {
+                    "java_agent_image":   "pubrepo.guance.com/datakit-operator/dd-lib-java-init:v1.8.4-guance",
+                    "python_agent_image": "pubrepo.guance.com/datakit-operator/dd-lib-python-init:v1.6.2",
+                    "js_agent_image":     "pubrepo.guance.com/datakit-operator/dd-lib-js-init:v3.9.2"
+                },
+                "envs": {
+                    "DD_AGENT_HOST":           "datakit-service.datakit.svc",
+                    "DD_TRACE_AGENT_PORT":     "9529",
+                    "DD_JMXFETCH_STATSD_HOST": "datakit-service.datakit.svc",
+                    "DD_JMXFETCH_STATSD_PORT": "8125"
+                }
+            },
+            "logfwd": {
+                "images": {
+                    "logfwd_image": "pubrepo.guance.com/datakit/logfwd:1.10.0"
+                }
+            },
+            "profiler": {
+                "images": {
+                    "java_profiler_image":   "pubrepo.jiagouyun.com/dataflux/async-profiler:0.1.0",
+                    "python_profiler_image": "pubrepo.jiagouyun.com/dataflux/py-spy:0.1.0",
+                    "golang_profiler_image": "pubrepo.jiagouyun.com/dataflux/pprof:0.1.0"
+                },
+                "envs": {
+                    "DK_AGENT_HOST":  "datakit-service.datakit.svc",
+                    "DK_AGENT_PORT":  "9529",
+                    "DK_PROFILE_VERSION": "1.2.333",
+                    "DK_PROFILE_ENV": "prod",
+                    "DK_PROFILE_DURATION": "240",
+                    "DK_PROFILE_SCHEDULE": "*/20 * * * *"
+                }
+            }
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datakit-operator
+  namespace: datakit
+  labels:
+    app: datakit-operator
+spec:
+  replicas: 1  # Do not change the ReplicaSet number!
+  selector:
+     matchLabels:
+       app: datakit-operator
+  template:
+    metadata:
+      labels:
+        app: datakit-operator
+    spec:
+      containers:
+        - name: operator
+          image: pubrepo.guance.com/datakit-operator/datakit-operator:v1.3.0
+          imagePullPolicy: Always
+          env:
+          - name: ENV_JSON_CONFIG
+            valueFrom:
+              configMapKeyRef:
+                name: datakit-operator-config
+                key: jsonconfig
+          ports:
+            - name: http
+              containerPort: 9543
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "1024Mi"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: datakit-operator-mutation
+webhooks:
+  - name: "mutation.datakit.svc"
+    rules:
+      - operations: [ "CREATE", "UPDATE"]
+        apiGroups: [ "" ]
+        apiVersions: [ "v1" ]
+        resources: [ "pods" ]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        namespace: datakit
+        name: datakit-operator
+        path: "/v1/webhooks/inject"
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURKakNDQWc2Z0F3SUJBZ0lVYjFPSkkzRTc3RzBoR1NveDJtZ3lYQUlLSEY0d0RRWUpLb1pJaHZjTkFRRUwKQlFBd0p6RWxNQ01HQTFVRUF3d2NaR0YwWVd0cGRDMXZjR1Z5WVhSdmNpNWtZWFJoYTJsMExuTjJZekFlRncweQpNekF6TVRBeE5qRXdNamxhRncwek16QXpNRGN4TmpFd01qbGFNQ2N4SlRBakJnTlZCQU1NSEdSaGRHRnJhWFF0CmIzQmxjbUYwYjNJdVpHRjBZV3RwZEM1emRtTXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUsKQW9JQkFRQ1poNks4Nmp5cTRSYjc1RGg2Z0xzb242MndoTmdMSUx4ZDduNTdkVWUwZ3hHV3pnc3NMQjZKWlRFMgpHNzdwTkJiT3VldGtmc21mVEZmZTJrY3FmbG9yN1dzZ3VsNVJmQnl3WlROU0JsRzRDT0dUSExMZktKbnVxUHp6Cm9kZGVjVzF3eDFNZ0JvVzRTSDRWb3gwZVk0Q1ZzdWc5SWxGVTQ5bmtZKzdtUGlPZlE0ZXJFTXdmd0hrYnR5SDYKYkswWXpCSmthdkFQLzJUcklSUXdhUW9PclpiR0ZERSsvYXhsZzUxRHpSa1MyREZCTWdUcVMwVFFXc0NKeFY1KwoxbHJTemRCWWVicHdTYkM1eUEvTXN2MUhxYTkwbmN0b1YxSHdpYWxSUmdaYThWL2ZwbHZ1ZFFxVDNTVWJPYmdjCmhJaHZkVm4zTUNKSzJIRWcwb3o4N2dXYWNReVBBZ01CQUFHalNqQklNQ2NHQTFVZEVRUWdNQjZDSEdSaGRHRnIKYVhRdGIzQmxjbUYwYjNJdVpHRjBZV3RwZEM1emRtTXdIUVlEVlIwT0JCWUVGQkNyQUt1SERxWHZZSzgzL1IvRwo0RElnbmNrRU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQmVRalVCT1A2T3R0S3FCaTN4OVQyQmZRU2xCaSs0ClR6UmtGQ21mZGsxS2J6OHZ6NGp4QzhXcy8xYWVZbHN6ckRuSSt5Qi9jaHdxcDIvMjJTbk1KajZ1aTRGalhUSVQKSUNFMFhmaUsyQ0VWVHhMMCt3bStMaDdkRkhtbkJ0N1NFREVObjJUa3ozRFhUVmMvUVBvV0RDNlM1dUNxZU8zVApab1pFVHFlajJHQmwwQlFyTSt0d0dGTUF1aHg1Y3AzbGVXRmlETFRVNzFmRXdLbGt3Y1plL2RhbnB2bENjY28xCkJTZjlZbmNhbW0xN1lqMmY0MlhIWnl2YWpPT1FuUHV4QkswSldzc2NFbisyckhVbGVmRnJsZERNSU5oWUJkckoKcktValhPYWFsM2VZbnRZOFExWUhNR2pGK2ZGdXFHZkE4d0l2MFpzN1BaQmhpRk1nSFl0RFJFYnUKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 5
+    reinvocationPolicy: Never
+    failurePolicy: Ignore
