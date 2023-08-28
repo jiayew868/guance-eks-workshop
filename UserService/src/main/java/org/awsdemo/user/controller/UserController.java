@@ -8,10 +8,13 @@ import org.awsdemo.core.entity.Order;
 import org.awsdemo.core.entity.User;
 import org.awsdemo.user.entity.UserOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +26,12 @@ public class UserController {
 
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
+
     @Autowired
-    private RestTemplate restTemplate;
+    private LoadBalancerClient loadBalancerClient;
+
+    @Resource
+    RestTemplate restTemplate;
 
     @NacosValue(value = "${useLocalCache:false}", autoRefreshed = true)
     private boolean useLocalCache;
@@ -47,6 +54,11 @@ public class UserController {
         logger.info("userOrder -- start");
         User user = new User();
         user.setUserId(userId);
+
+        ServiceInstance serviceInstance = loadBalancerClient.choose("order-service");
+
+        logger.info("order service ip : {} port : {}",serviceInstance.getHost(),serviceInstance.getPort());
+
         ResponseEntity<Order[]> responseEntity = restTemplate.getForEntity("http://order-service/order/list/userid/"+ userId, Order[].class);
         Order[] orderArray = responseEntity.getBody();
         List<Order> orders = new ArrayList<>();
@@ -58,6 +70,7 @@ public class UserController {
         logger.info("userOrder -- end");
        return userOrder;
     }
+
 
 
 }

@@ -10,7 +10,7 @@ docker build --build-arg JAR_FILE=UserService-1.0.jar -t awsdemo/user_service -f
 docker run \
 --name user_service \
 -p 8081:8081 \
--e JAVA_OPTS="-javaagent:/usr/dd-java-agent/agent/dd-java-agent-1.19.1.jar -Ddd.agent.port=9529 -Dspring.cloud.nacos.config.server-addr=192.168.5.20:8848 -Dspring.cloud.nacos.discovery.server-addr=192.168.5.20:8848" \
+-e JAVA_OPTS=" -Ddd.agent.port=9529 -Dspring.cloud.nacos.config.server-addr=192.168.5.102:8848 -Dspring.cloud.nacos.discovery.server-addr=192.168.5.102:8848" \
 -e envir="test" \
 -e LOG_PATH="/var/log/awsdemo/user-svr" \
 -e MY_NODE_NAME="user" \
@@ -28,3 +28,5 @@ awsdemo/user_service:latest
     4，docker push 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/user_service:latest
 
 ### 测试
+    
+    http://k8s-nacosdem-nacosdem-9779feeb68-1087201107.cn-northwest-1.elb.amazonaws.com.cn/user/1/user_orders

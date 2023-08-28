@@ -40,5 +40,5 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set serviceAccount.name=aws-load-balancer-controller
 
 
-kubectl get deployment -n kube-system aws-load-balancer-controller  --cluster=eks-workshop02.cn-northwest-1.eksctl.io
+kubectl get deployment -n kube-system aws-load-balancer-controller --cluster=eks-workshop02.cn-northwest-1.eksctl.io
 

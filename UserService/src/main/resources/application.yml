@@ -14,7 +14,7 @@ spring:
         server-addr: 127.0.0.1:8848
         register-enabled: true
       config:
-        enabled: false
+        enabled: true
         file-extension: properties
         server-addr: 127.0.0.1:8848
        ## server-addr: 13.214.71.127:8848

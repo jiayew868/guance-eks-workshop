@@ -16,9 +16,4 @@ public class Main {
         SpringApplication.run(Main.class, args);
     }
 
-    @Bean
-    @LoadBalanced // 开启负载均衡 Ribbon, 发送的请求都会被Ribbon拦截。必须使用应用名代替ip，否则报错
-    public RestTemplate restTemplate(){
-        return new RestTemplate();
-    }
 }
