@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nacosdemo
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nacosdemo-config
+  namespace: nacosdemo
+data:
+  DD_AGENT: "-javaagent:/usr/dd-java-agent/agent/dd-java-agent-1.19.1.jar -Ddd.agent.port=9529"
+  ##JAVA_OPTS2: "-Xms512m -Xmx1g"
+  JAVA_OPTS: "-Dspring.cloud.nacos.config.server-addr=nacos-cs.default.svc.cluster.local:8848 -Dspring.cloud.nacos.discovery.server-addr=nacos-cs.default.svc.cluster.local:8848"
+  envir: "prod"
+  LOG_PATH: "/var/log/awsdemo/"
+
+

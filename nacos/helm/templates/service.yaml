@@ -26,6 +26,7 @@ spec:
   selector:
     app.kubernetes.io/name: {{ include "nacos.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    env: fargate
   {{- end }}
 ---
 apiVersion: v1
@@ -61,3 +62,4 @@ spec:
   selector:
     app.kubernetes.io/name: {{ include "nacos.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    env: fargate

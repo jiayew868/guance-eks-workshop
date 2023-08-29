@@ -1,4 +1,4 @@
-package org.awsdemo.config;
+package org.awsdemo.user.config;
 
 
 import org.springframework.context.annotation.Configuration;

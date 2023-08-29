@@ -9,15 +9,17 @@ kind: Deployment
 metadata:
   namespace: game-2048
   name: deployment-2048
+
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: app-2048
-  replicas: 5
+  replicas: 3
   template:
     metadata:
       labels:
         app.kubernetes.io/name: app-2048
+        env: fargate
     spec:
       containers:
       - image: public.ecr.aws/l6m2t8p7/docker-2048:latest
@@ -25,6 +27,12 @@ spec:
         name: app-2048
         ports:
         - containerPort: 80
+        resources:
+            requests:
+              cpu: '0.5'
+              memory: '200Mi'
+            limits:
+              memory: '200Mi'
 ---
 apiVersion: v1
 kind: Service
@@ -39,6 +47,7 @@ spec:
   type: NodePort
   selector:
     app.kubernetes.io/name: app-2048
+    env: fargate
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -48,6 +57,8 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internal
     alb.ingress.kubernetes.io/target-type: ip
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/subnets: subnet-03275706fdd1badad,subnet-061b17a839a60623c
 spec:
   ingressClassName: alb
   rules:

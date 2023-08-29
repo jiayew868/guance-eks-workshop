@@ -1,0 +1,12 @@
+GET http://localhost:8081/user/hello
+Accept: application/json
+
+###
+
+
+
+GET http://www.google.com
+Accept: application/json
+
+###
+

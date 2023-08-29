@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: nacosdemo
+  labels:
+    app: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+      annotations:
+        admission.datakit/java-lib.version: ""
+    spec:
+      containers:
+        - name: order-service
+          image: 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/order_service:latest
+          ports:
+            - containerPort: 8082
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          env:
+          - name: MY_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: DD_OPTS
+            value: -Ddd.env=prod -Ddd.service=order-service 
+                    -Ddd.jmxfetch.enabled=true -Ddd.jmxfetch.check-period=1000 
+                    -Ddd.jmxfetch.statsd.port=8125 -Ddd.profiling.enabled=true 
+                    -Ddd.profiling.allocation.enabled=true -Duser.timezone=GMT+8
+          envFrom:
+            - configMapRef:
+                name: nacosdemo-config
+          volumeMounts:
+            - name: log-path
+              mountPath: /var/log/
+      volumes:
+        - name: log-path
+          hostPath:
+            path: /var/log/

@@ -1,4 +1,4 @@
-package org.awsdemo.entity;
+package org.awsdemo.user.entity;
 
 
 import com.google.common.collect.Lists;

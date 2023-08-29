@@ -12,19 +12,14 @@ spring:
     nacos:
       discovery:
         enabled: true
-        server-addr: 127.0.0.1:8848
+        server-addr: 192.168.31.12:9848
         register-enabled: true
       config:
-        enabled: false
+        enabled: true
         file-extension: properties
-        server-addr: 127.0.0.1:8848
+        server-addr: 192.168.31.12:8848
 
-#nacos:
-#  config:
-#    server-addr: 127.0.0.1:8848
-#    context-path: nacos
-#    data-id: user-svr
-#    auto-refresh: true
-#    bootstrap:
-#      enable: true
-
+#logging:
+#  file:
+#    path: /var/log/awsdemo/${spring.application.name}
+#  config: classpath:log4j2-spring.xml

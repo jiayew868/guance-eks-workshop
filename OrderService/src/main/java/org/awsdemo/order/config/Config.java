@@ -1,4 +1,4 @@
-package org.awsdemo.config;
+package org.awsdemo.order.config;
 
 
 import org.springframework.context.annotation.Configuration;

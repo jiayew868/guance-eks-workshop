@@ -1,14 +1,27 @@
 # 基于哪个镜像
-FROM java:8
-# 将本地文件夹挂载到当前容器
-VOLUME /tmp
-VOLUME /logs
+FROM anapsix/alpine-java:latest
 
+# 设置工作目录
+WORKDIR /app
+
+# 声明需要挂载的目录
+VOLUME /tmp
+VOLUME /app/logs
+
+# 设置环境变量
+ENV envir=""
+ENV JAVA_OPTS=""
+ENV LOG_PATH=""
+ENV DD_OPTS=""
+
+# 设置构建参数
 ARG JAR_FILE
 
-# 拷贝文件到容器
-ADD /target/${JAR_FILE}  app.jar
-#声明需要暴露的端口
-EXPOSE 8090
-#配置容器启动后执行的命令
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+# 复制jar文件到容器中
+COPY target/${JAR_FILE} app.jar
+
+# 声明需要暴露的端口
+EXPOSE 8082
+# 设置容器启动命令
+
+ENTRYPOINT ["sh","-c","java -Djava.security.egd=file:/dev/./urandom $DD_OPTS $JAVA_OPTS -Ddd.service=order-service -jar app.jar --logging.file.path=$LOG_PATH --spring.profiles.active=$envir"]

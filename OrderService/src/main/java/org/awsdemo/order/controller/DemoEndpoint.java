@@ -1,4 +1,4 @@
-package org.awsdemo.order.config;
+package org.awsdemo.order.controller;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;

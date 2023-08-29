@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: nacosdemo
+  labels:
+    app: user-service
+spec:
+  ports:
+    - name: http
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: user-service
+#  type: ClusterIP
+  type: NodePort

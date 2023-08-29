@@ -1,0 +1,56 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datakit-conf
+  namespace: datakit
+data: []
+
+  #mysql.conf: |-
+  #  [inputs.mysql]
+  #  ...
+  #redis.conf: |-
+  #  [inputs.redis]
+  #  ...
+  # pythond.conf: |
+  #   [[inputs.pythond]]
+  #     # Python input name
+  #     name = 'some-python-inputs'  # required
+  #     # System environments to run Python
+  #     #envs = ['LD_LIBRARY_PATH=/path/to/lib:$LD_LIBRARY_PATH',]
+  #     # Python path(recomment abstract Python path)
+  #     cmd = "python3" # required. python3 is recommended.
+  #     # Python scripts relative path
+#     dirs = ["hellopythond"]
+---
+
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: python-scripts
+#   namespace: datakit
+# data:
+#     hellopythond.py: |
+#       from datakit_framework import DataKitFramework
+#       import random
+#       class HelloPythond(DataKitFramework):
+#           __name = 'HelloPythond'
+#           interval = 10
+#           def run(self):
+#               rd = random.randint(1, 100)
+#               data = [
+#                 {
+#                     "measurement": "random_number",
+#                     "tags": {
+#                       "tag_name": "tag_value",
+#                     },
+#                     "fields": {
+#                       "number": rd,
+#                     },
+#                 },
+#               ]
+#               in_data = {
+#                   'M':data,
+#                   'input': "pyfromgit"
+#               }
+#               return self.report(in_data)
