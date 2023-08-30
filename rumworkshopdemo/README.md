@@ -4,10 +4,6 @@
 
 通过demo的搭建，你将能基本了解[rum的接入](https://docs.guance.com/real-user-monitoring/web/app-access/)，[rum的数据体系](https://docs.guance.com/real-user-monitoring/web/app-data-collection/)，rum的[中阶玩法](https://docs.guance.com/real-user-monitoring/web/custom-sdk/)：
 
-- [自定义user](https://docs.guance.com/real-user-monitoring/web/custom-sdk/user-id/)
-- [自定义事件](https://docs.guance.com/real-user-monitoring/web/custom-sdk/add-action/)
-- [自定义错误](https://docs.guance.com/real-user-monitoring/web/custom-sdk/add-error/)
-- [自定义Tag](https://docs.guance.com/real-user-monitoring/web/custom-sdk/add-additional-tag/)
 
 
 ## vue项目搭建
@@ -87,6 +83,11 @@ npm run serve
 - applicationId: '<demo>',//这里需要填写应用id
 - datakitOrigin: '<DATAKIT ORIGIN>', // 这里需要填写headless的域名，协议（包括：//），域名（或IP地址）[和端口号]
     
-    
+  
  ## 剩下的就是高级功能了
+ 
+- [自定义user](https://docs.guance.com/real-user-monitoring/web/custom-sdk/user-id/)
+- [自定义事件](https://docs.guance.com/real-user-monitoring/web/custom-sdk/add-action/)
+- [自定义错误](https://docs.guance.com/real-user-monitoring/web/custom-sdk/add-error/)
+- [自定义Tag](https://docs.guance.com/real-user-monitoring/web/custom-sdk/add-additional-tag/)
  
