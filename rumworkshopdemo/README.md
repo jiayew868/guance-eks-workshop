@@ -1,6 +1,6 @@
 # demo背景介绍
 
-这是[真实用户体验（rum）](https://docs.guance.com/real-user-monitoring/)的demo，使用最容易上手的[vue](https://cli.vuejs.org/config/))，保证哪怕前端初学者也能够快速接入观测云的rum，在这个基础上也加入了中高阶功能，供探索。
+这是[真实用户体验（rum）](https://docs.guance.com/real-user-monitoring/)的demo，使用最容易上手的[vue](https://cli.vuejs.org/config/)，保证哪怕前端初学者也能够快速接入观测云的rum，在这个基础上也加入了中高阶功能，供探索。
 
 通过demo的搭建，你将能基本了解[rum的接入](https://docs.guance.com/real-user-monitoring/web/app-access/)，[rum的数据体系](https://docs.guance.com/real-user-monitoring/web/app-data-collection/)，rum的[中阶玩法](https://docs.guance.com/real-user-monitoring/web/custom-sdk/)：
 
