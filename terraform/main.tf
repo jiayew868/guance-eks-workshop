@@ -49,14 +49,14 @@ resource "aws_internet_gateway" "main" {
 }
 
 resource "aws_nat_gateway" "nat_gateway" {
-  count         = 2
+  count         = 1
   allocation_id = aws_eip.nat_eip[count.index].id
   subnet_id     = aws_subnet.public_subnet[count.index].id
   tags          = var.tags
 }
 
 resource "aws_eip" "nat_eip" {
-  count = 2
+  count = 1
   tags  = var.tags
 }
 
@@ -67,7 +67,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 }
 
 resource "aws_security_group" "eks" {
-  name        = "${var.env_name} eks cluster"
+  name        = "${module.eks_cluster.oidc_provider} eks cluster"
   description = "Allow traffic"
   vpc_id      = aws_vpc.main.id
 
@@ -89,34 +89,157 @@ resource "aws_security_group" "eks" {
   }
 
   tags = merge({
-    Name = "EKS ${var.env_name}",
-    "kubernetes.io/cluster/${local.eks_name}": "owned"
+    Name = "EKS prod",
+    "kubernetes.io/cluster/guance-eks-cluster": "owned"
   }, var.tags)
 }
-
-
 
 
 module "eks_cluster" {
   source                    = "terraform-aws-modules/eks/aws"
   cluster_name              = "guance-eks-cluster"
   cluster_version           = "1.21"
-  subnets                   = aws_subnet.private_subnet[*].id
   vpc_id                    = aws_vpc.main.id
+  subnets                   = aws_subnet.private_subnet[*].id
+
+
+  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
   cluster_enabled_log_types = ["api", "audit", "authenticator"]
   tags                      = var.tags
+  cluster_additional_security_group_ids = [aws_security_group.eks.id]
+
+
+  eks_managed_node_group_defaults = {
+    ami_type               = "AL2_x86_64"
+    disk_size              = 100
+    instance_types         = ["t3.medium", "t3.large"]
+    vpc_security_group_ids = [aws_security_group.eks.id]
+  }
+
+  eks_managed_node_groups = {
+    blue = {
+
+    }
+
+    green = {
+      min_size     = 1
+      max_size     = 4
+      desired_size = 3
+
+      instance_types = ["t3.large"]
+#      capacity_type  = "SPOT"
+      labels = var.tags
+      taints = {
+      }
+      tags = var.tags
+    }
+  }
 }
 
-module "alb_ingress_controller" {
-  source = "terraform-aws-modules/alb-ingress-controller/aws"
+module "lb_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  cluster_name = module.eks_cluster.cluster_id
-  vpc_id       = aws_vpc.main.id
+  role_name = "${module.eks_cluster.cluster_name}_eks_lb"
+  attach_load_balancer_controller_policy = true
 
-  alb_ingress_controller_namespace = "kube-system"
-  alb_ingress_controller_image_tag = "v1.1.8"
-  tags                             = var.tags
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks_cluster.oidc_provider
+      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+    }
+  }
 }
+
+provider "kubernetes" {
+  host                   = module.eks_cluster.cluster_endpoint
+#  cluster_ca_certificate = base64decode(var.cluster_ca_cert)
+  exec {
+    api_version = "client.authentication.k8s.io/v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", "guance-eks-cluster"]
+    command     = "aws"
+  }
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.eks_cluster.oidc_provider
+#    cluster_ca_certificate = base64decode(var.cluster_ca_cert)
+    exec {
+      api_version = "client.authentication.k8s.io/v1alpha1"
+      args        = ["eks", "get-token", "--cluster-name", module.eks_cluster.oidc_provider]
+      command     = "aws"
+    }
+  }
+}
+
+resource "kubernetes_service_account" "service-account" {
+  metadata {
+    name = "aws-load-balancer-controller"
+    namespace = "kube-system"
+    labels = {
+      "app.kubernetes.io/name"= "aws-load-balancer-controller"
+      "app.kubernetes.io/component"= "controller"
+    }
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.lb_role.arn
+      "eks.amazonaws.com/sts-regional-endpoints" = "true"
+    }
+  }
+}
+
+resource "helm_release" "lb" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+  depends_on = [
+    kubernetes_service_account.service-account
+  ]
+
+  set {
+    name  = "region"
+    value = "ap-southeast-1"
+  }
+
+  set {
+    name  = "vpcId"
+    value = aws_vpc.main.id
+  }
+
+  set {
+    name  = "image.repository"
+    value = "602401143452.dkr.ecr.eu-west-2.amazonaws.com/amazon/aws-load-balancer-controller"
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = "false"
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
+
+  set {
+    name  = "clusterName"
+    value = module.eks_cluster.cluster_name
+  }
+}
+
+#module "alb_ingress_controller" {
+#  source = "terraform-aws-modules/alb-ingress-controller/aws"
+#
+#  cluster_name = module.eks_cluster.cluster_id
+#  vpc_id       = s_vpc.main.idaw
+#
+#  alb_ingress_controller_namespace = "kube-system"
+#  alb_ingress_controller_image_tag = "v1.1.8"
+#  tags                             = var.tags
+#}
+
+
 
 
 resource "aws_db_instance" "database" {
@@ -152,9 +275,9 @@ resource "aws_elasticache_cluster" "redis_cluster" {
 }
 
 
-output "eks_alb_address" {
-  value = module.alb_ingress_controller.load_balancer_dns_name
-}
+#output "eks_alb_address" {
+#  value = module.alb_ingress_controller.load_balancer_dns_name
+#}
 
 output "rds_endpoint" {
   value = aws_db_instance.database.endpoint
