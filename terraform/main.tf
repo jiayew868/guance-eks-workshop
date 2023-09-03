@@ -1,7 +1,10 @@
+// 提供商配置，设置AWS为提供商，指定区域和配置文件
 provider "aws" {
-  region = "ap-southeast-1" # 新加坡区域
+  region  = "ap-southeast-1"
+  profile = "sg"
 }
 
+// 定义可以被复用的标签
 variable "tags" {
   type = map(any)
   default = {
@@ -11,63 +14,125 @@ variable "tags" {
   }
 }
 
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  tags       = var.tags
+locals {
+  cluster_name = "guance-workshop"
 }
 
+
+
+
+// 创建VPC
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  tags                 = merge(var.tags, { Name = "guance-workshop-vpc" })
+  enable_dns_hostnames = true
+}
+
+
+// 创建互联网网关
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+  tags   = var.tags
+}
+
+// 创建公网路由表
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.main.id
+}
+
+// 在公网路由表中创建默认路由，并指向互联网网关
+resource "aws_route" "public_default_route" {
+  route_table_id         = aws_route_table.public_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}
+
+// 创建两个公网子网
 resource "aws_subnet" "public_subnet" {
-  count                   = 2
-  cidr_block              = "10.0.${count.index * 2}.0/24"
-  vpc_id                  = aws_vpc.main.id
-  availability_zone       = count.index % 2 == 0 ? "ap-southeast-1a" : "ap-southeast-1b" # 分别在可用区1和2
-  map_public_ip_on_launch = true
+  count             = 2
+  cidr_block        = "10.0.${count.index * 2}.0/24"
+  vpc_id            = aws_vpc.main.id
+  availability_zone = count.index % 2 == 0 ? "ap-southeast-1a" : "ap-southeast-1b"
+
+
   tags = merge(var.tags, {
-    Name = "public-subnet-${count.index + 1}"
+    Name                                          = "public-subnet-${count.index + 1}"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = 1
   })
 }
 
+// 将公网子网关联到公网路由表
+resource "aws_route_table_association" "public_subnet_association" {
+  count          = 2
+  subnet_id      = aws_subnet.public_subnet[count.index].id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+// 创建私有路由表
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.main.id
+}
+
+// 创建默认NAT网关路由
+resource "aws_route" "private_nat_route" {
+  route_table_id         = aws_route_table.private_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.nat_gateway.id
+}
+
+// 创建两个私有子网
 resource "aws_subnet" "private_subnet" {
   count             = 2
   cidr_block        = "10.0.${count.index * 2 + 1}.0/24"
   vpc_id            = aws_vpc.main.id
-  availability_zone = count.index % 2 == 0 ? "ap-southeast-1a" : "ap-southeast-1b" # 分别在可用区1和2
+  availability_zone = count.index % 2 == 0 ? "ap-southeast-1a" : "ap-southeast-1b"
+
   tags = merge(var.tags, {
-    Name = "private-subnet-${count.index + 1}"
+    Name                                          = "private-subnet-${count.index + 1}"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = 1
   })
 }
 
+// 将私有子网关联到私有路由表
+resource "aws_route_table_association" "private_subnet_association" {
+  count          = 2
+  subnet_id      = aws_subnet.private_subnet[count.index].id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+// 创建数据库用的安全组
 resource "aws_security_group" "db_sg" {
   name_prefix = "db-"
   vpc_id      = aws_vpc.main.id
   tags        = var.tags
 }
 
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
-  tags   = var.tags
+// 创建EIP资源
+resource "aws_eip" "nat_eip" {
+  tags = var.tags
 }
 
+// 创建NAT网关
 resource "aws_nat_gateway" "nat_gateway" {
-  count         = 1
-  allocation_id = aws_eip.nat_eip[count.index].id
-  subnet_id     = aws_subnet.public_subnet[count.index].id
+  allocation_id = aws_eip.nat_eip.id
+  subnet_id     = aws_subnet.public_subnet[0].id
+  depends_on    = [aws_internet_gateway.main]
   tags          = var.tags
 }
 
-resource "aws_eip" "nat_eip" {
-  count = 1
-  tags  = var.tags
-}
 
+// 在私有子网中创建数据库子网组
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "my-db-subnet-group"
+  name       = "guanceworkshop-db-subnet-group"
   subnet_ids = aws_subnet.private_subnet[*].id
   tags       = var.tags
 }
 
+// 创建一个为EKS集群服务的安全组
 resource "aws_security_group" "eks" {
-  name        = "${module.eks_cluster.oidc_provider} eks cluster"
+  name        = "guance-workshop"
   description = "Allow traffic"
   vpc_id      = aws_vpc.main.id
 
@@ -89,159 +154,37 @@ resource "aws_security_group" "eks" {
   }
 
   tags = merge({
-    Name = "EKS prod",
-    "kubernetes.io/cluster/guance-eks-cluster": "owned"
+    Name = "guance-eks-workshop",
+    "kubernetes.io/cluster/guance-eks-cluster" : "owned"
   }, var.tags)
 }
 
+// 创建一个允许SSH访问的安全组
+resource "aws_security_group" "ssh_sg" {
+  name_prefix = "guancewworkshop-remote-access"
+  description = "Allow remote SSH access"
+  vpc_id      = aws_vpc.main.id
 
-module "eks_cluster" {
-  source                    = "terraform-aws-modules/eks/aws"
-  cluster_name              = "guance-eks-cluster"
-  cluster_version           = "1.21"
-  vpc_id                    = aws_vpc.main.id
-  subnets                   = aws_subnet.private_subnet[*].id
-
-
-  cluster_endpoint_private_access = true
-  cluster_endpoint_public_access  = true
-  cluster_enabled_log_types = ["api", "audit", "authenticator"]
-  tags                      = var.tags
-  cluster_additional_security_group_ids = [aws_security_group.eks.id]
-
-
-  eks_managed_node_group_defaults = {
-    ami_type               = "AL2_x86_64"
-    disk_size              = 100
-    instance_types         = ["t3.medium", "t3.large"]
-    vpc_security_group_ids = [aws_security_group.eks.id]
+  ingress {
+    description = "SSH access"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  eks_managed_node_groups = {
-    blue = {
-
-    }
-
-    green = {
-      min_size     = 1
-      max_size     = 4
-      desired_size = 3
-
-      instance_types = ["t3.large"]
-#      capacity_type  = "SPOT"
-      labels = var.tags
-      taints = {
-      }
-      tags = var.tags
-    }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
+
+  tags = merge(var.tags, { Name = "ssh-remote" })
 }
 
-module "lb_role" {
-  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-
-  role_name = "${module.eks_cluster.cluster_name}_eks_lb"
-  attach_load_balancer_controller_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks_cluster.oidc_provider
-      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
-    }
-  }
-}
-
-provider "kubernetes" {
-  host                   = module.eks_cluster.cluster_endpoint
-#  cluster_ca_certificate = base64decode(var.cluster_ca_cert)
-  exec {
-    api_version = "client.authentication.k8s.io/v1alpha1"
-    args        = ["eks", "get-token", "--cluster-name", "guance-eks-cluster"]
-    command     = "aws"
-  }
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = module.eks_cluster.oidc_provider
-#    cluster_ca_certificate = base64decode(var.cluster_ca_cert)
-    exec {
-      api_version = "client.authentication.k8s.io/v1alpha1"
-      args        = ["eks", "get-token", "--cluster-name", module.eks_cluster.oidc_provider]
-      command     = "aws"
-    }
-  }
-}
-
-resource "kubernetes_service_account" "service-account" {
-  metadata {
-    name = "aws-load-balancer-controller"
-    namespace = "kube-system"
-    labels = {
-      "app.kubernetes.io/name"= "aws-load-balancer-controller"
-      "app.kubernetes.io/component"= "controller"
-    }
-    annotations = {
-      "eks.amazonaws.com/role-arn" = module.lb_role.arn
-      "eks.amazonaws.com/sts-regional-endpoints" = "true"
-    }
-  }
-}
-
-resource "helm_release" "lb" {
-  name       = "aws-load-balancer-controller"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-load-balancer-controller"
-  namespace  = "kube-system"
-  depends_on = [
-    kubernetes_service_account.service-account
-  ]
-
-  set {
-    name  = "region"
-    value = "ap-southeast-1"
-  }
-
-  set {
-    name  = "vpcId"
-    value = aws_vpc.main.id
-  }
-
-  set {
-    name  = "image.repository"
-    value = "602401143452.dkr.ecr.eu-west-2.amazonaws.com/amazon/aws-load-balancer-controller"
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
-  }
-
-  set {
-    name  = "clusterName"
-    value = module.eks_cluster.cluster_name
-  }
-}
-
-#module "alb_ingress_controller" {
-#  source = "terraform-aws-modules/alb-ingress-controller/aws"
-#
-#  cluster_name = module.eks_cluster.cluster_id
-#  vpc_id       = s_vpc.main.idaw
-#
-#  alb_ingress_controller_namespace = "kube-system"
-#  alb_ingress_controller_image_tag = "v1.1.8"
-#  tags                             = var.tags
-#}
-
-
-
-
+// 创建一个MySQL数据库实例
 resource "aws_db_instance" "database" {
   allocated_storage    = 30
   storage_type         = "gp3"
@@ -253,16 +196,17 @@ resource "aws_db_instance" "database" {
   password             = "password"
   parameter_group_name = "default.mysql8.0"
   db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
-  skip_final_snapshot  = true # 注意这是一个示例，生产环境可能需要适当的快照策略
-  tags                 = var.tags
+  skip_final_snapshot  = true // 注意这是一个示例，生产环境可能需要适当的快照策略
+  tags                 = merge(var.tags, { Name = "guanceworkshop-db" })
 }
 
+// 创建ElastiCache子网组
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
-  name       = "redis-subnet-group"
+  name       = "guanceworkshop-redis-sg"
   subnet_ids = aws_subnet.private_subnet[*].id
 }
 
-
+// 创建一个Redis集群
 resource "aws_elasticache_cluster" "redis_cluster" {
   cluster_id           = "my-redis-cluster"
   engine               = "redis"
@@ -270,21 +214,8 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   node_type            = "cache.t4g.medium"
   num_cache_nodes      = 1
   port                 = 6379
-  parameter_group_name = "default.redis7.0.cluster.on"
+  parameter_group_name = "default.redis7"
   subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
-}
-
-
-#output "eks_alb_address" {
-#  value = module.alb_ingress_controller.load_balancer_dns_name
-#}
-
-output "rds_endpoint" {
-  value = aws_db_instance.database.endpoint
-}
-
-output "redis_endpoint" {
-  value = aws_elasticache_cluster.redis_cluster.cluster_address
 }
 
 
