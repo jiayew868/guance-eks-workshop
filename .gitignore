@@ -202,9 +202,15 @@ local.properties
 # Typically, this file would be tracked if it contains build/dependency configurations:
 #.project
 
-!/terraform/.terraform/
+/terraform/.terraform/
 
 
 .DS_Store!/logs/
 /logs/*
 
+
+
+/terraform/.terraform.lock.hcl
+
+/terraform/terraform.tfstate
+/terraform/terraform.tfstate.backup
