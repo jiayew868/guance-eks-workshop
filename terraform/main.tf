@@ -1,7 +1,7 @@
 // 提供商配置，设置AWS为提供商，指定区域和配置文件
 provider "aws" {
   region  = "ap-southeast-1"
-  profile = "sg"
+  profile = var.awsctl-profile
 }
 
 // 定义可以被复用的标签
@@ -14,11 +14,12 @@ variable "tags" {
   }
 }
 
+variable "awsctl-profile" {}
+
+
 locals {
   cluster_name = "guance-workshop"
 }
-
-
 
 
 // 创建VPC
