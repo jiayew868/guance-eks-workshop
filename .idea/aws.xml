@@ -12,14 +12,11 @@
     </option>
     <option name="recentlyUsedRegions">
       <list>
-        <option value="ap-southeast-1" />
         <option value="cn-northwest-1" />
+        <option value="ap-southeast-1" />
         <option value="us-west-1" />
         <option value="us-east-1" />
       </list>
     </option>
-  </component>
-  <component name="connectionManager">
-    <option name="activeConnectionId" value="AwsConnectionManagerConnection" />
   </component>
 </project>

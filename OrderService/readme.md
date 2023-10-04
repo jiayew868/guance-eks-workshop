@@ -30,6 +30,14 @@ docker run \
 ### 部署Pod到EKS
 
 
-### push pulic REPO
+### push public REPO
+
+
+### Test API
+http://localhost:8082/order/{orderid}
+http://localhost:8082/order/list
+http://localhost:8082/order/list/userid/{userid}
+
+
     
 

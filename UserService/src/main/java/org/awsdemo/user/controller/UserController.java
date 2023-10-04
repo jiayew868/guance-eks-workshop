@@ -49,11 +49,11 @@ public class UserController {
         return useLocalCache;
     }
 
-    @GetMapping(value = "/{userid}/user_orders")
-    public UserOrder userOrder(@PathVariable("userid") String userId){
+    @GetMapping(value = "/{userid}/user-orders")
+    public UserOrder userOrder(@PathVariable("userid") Long userId){
         logger.info("userOrder -- start");
         User user = new User();
-        user.setUserId(userId);
+        user.setId(userId);
 
         ServiceInstance serviceInstance = loadBalancerClient.choose("order-service");
 
@@ -71,6 +71,11 @@ public class UserController {
        return userOrder;
     }
 
+    @GetMapping(value = "/all")
+    public List<User> getALL(){
+        User user = new User();
+        return user.selectAll();
+    }
 
 
 }

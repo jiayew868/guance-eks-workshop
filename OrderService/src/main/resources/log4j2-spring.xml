@@ -76,6 +76,7 @@
         </RollingFile>
     </appenders>
     <loggers>
+
         <root level="info" includeLocation="true">
             <appender-ref ref="Console"/>
             <appender-ref ref="RollingFileInfo"/>
@@ -83,5 +84,9 @@
             <appender-ref ref="RollingFileError"/>
             <appender-ref ref="RollingFileDebug"/>
         </root>
+        <Logger name="org.awsdemo.order.dal.Mapper" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
     </loggers>
 </Configuration>

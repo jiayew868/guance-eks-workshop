@@ -1,15 +1,46 @@
 package org.awsdemo.core.entity;
 
-public class Order {
 
-    private String orderId;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
-    public String getOrderId() {
-        return orderId;
-    }
+@Data
+@ToString
+@EqualsAndHashCode
+@TableName(value = "T_Order")
+public class Order implements Serializable {
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
+    @TableId(value = "order_id",type = IdType.AUTO)
+    private Long id;
+
+    @TableField("user_id")
+    private Long userId;
+
+    @TableField("status")
+    private String status;
+
+    @TableField("order_date")
+    private LocalDateTime orderDate;
+
+    @TableField("product_name")
+    private String productName;
+
+    @TableField("product_price")
+    private double productPrice;
+
+    @TableField("product_quantity")
+    private int quantity;
+
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.UPDATE)
+    private LocalDateTime updateTime;
+
 }

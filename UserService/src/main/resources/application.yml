@@ -17,7 +17,28 @@ spring:
         enabled: true
         file-extension: properties
         server-addr: 127.0.0.1:8848
+
        ## server-addr: 13.214.71.127:8848
+  cache:
+    type: redis
+    cache-names: redisCache
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/guancedb?useSSL=false&allowPublicKeyRetrieval=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    hikari:
+      maximum-pool-size: 1
+
+  redis:
+    host: localhost
+    database: 0
+    port: 6379
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #nacos:
 #  config:
@@ -27,6 +48,8 @@ spring:
 #    auto-refresh: true
 #    bootstrap:
 #      enable: true
+
+
 
 
 

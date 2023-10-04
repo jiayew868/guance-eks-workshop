@@ -27,6 +27,7 @@ awsdemo/user_service:latest
     3，docker tag awsdemo/user_service:latest 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/user_service:latest
     4，docker push 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/user_service:latest
 
-### 测试
-    
-    http://k8s-nacosdem-nacosdem-9779feeb68-1087201107.cn-northwest-1.elb.amazonaws.com.cn/user/1/user_orders
+
+### Test API
+http://localhost:8081/user/all
+http://localhost:8081/user/1/user-orders

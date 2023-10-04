@@ -1,28 +1,45 @@
 package org.awsdemo.core.entity;
 
 
+import com.baomidou.mybatisplus.annotation.*;
 
-public class User {
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
-    private String userId;
+@Data
+@ToString
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "T_User")
+public class User extends Model<User> {
+
+    @TableId(value = "user_id",type = IdType.AUTO)
+    private Long id;
+
+    @TableField("username")
+    private String username;
+
+    @TableField("email")
+    private String email;
 
 
-    private String name;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
 
-    public String getUserId() {
-        return userId;
+    @TableField(fill = FieldFill.UPDATE)
+    private LocalDateTime updateTime;
+
+
+    @Override
+    public Serializable pkVal() {
+        return id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

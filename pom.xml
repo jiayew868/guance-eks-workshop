@@ -33,7 +33,6 @@
         <httpclient.version>4.5</httpclient.version>
     </properties>
 
-
     <!--  只声明依赖，不引入依赖 -->
     <dependencyManagement>
         <dependencies>
