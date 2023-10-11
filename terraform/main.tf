@@ -4,6 +4,12 @@ provider "aws" {
   profile = var.awsctl-profile
 }
 
+locals {
+  workshop_name = "guance-eks"
+  cluster_name  = "guance-eks-cluster"
+}
+
+
 // 定义可以被复用的标签
 variable "tags" {
   type = map(any)
@@ -16,10 +22,6 @@ variable "tags" {
 
 variable "awsctl-profile" {}
 
-
-locals {
-  cluster_name = "guance-workshop"
-}
 
 
 // 创建VPC
@@ -156,7 +158,7 @@ resource "aws_security_group" "eks" {
 
   tags = merge({
     Name = "guance-eks-workshop",
-    "kubernetes.io/cluster/guance-eks-cluster" : "owned"
+    ## "kubernetes.io/cluster/guance-eks-cluster" : "owned"
   }, var.tags)
 }
 
@@ -192,7 +194,7 @@ resource "aws_db_instance" "database" {
   engine               = "mysql"
   engine_version       = "8.0.33"
   instance_class       = "db.t4g.medium"
-  db_name              = "mydb"
+  db_name              = "guancedb"
   username             = "admin"
   password             = "password"
   parameter_group_name = "default.mysql8.0"
@@ -219,6 +221,12 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
 }
 
-
+// 创建cloud9
+#resource "aws_cloud9_environment_ec2" "cloud9" {
+#  instance_type = "t3.small"
+#  name          = "guance-env"
+#  subnet_id     = aws_subnet.public_subnet[0].id
+#  tags          = merge(var.tags)
+#}
 
 #terraform apply -auto-approve | grep "eks_alb_address\|rds_endpoint\|redis_endpoint"

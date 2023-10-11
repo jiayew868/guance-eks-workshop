@@ -5,12 +5,12 @@ module "eks_cluster" {
   source  = "terraform-aws-modules/eks/aws"
   version = ">= 19.0"
 
-  cluster_name    = "guance-eks-cluster"
+  cluster_name    = local.cluster_name
   cluster_version = "1.27"
   vpc_id          = aws_vpc.main.id
   subnet_ids      = aws_subnet.private_subnet[*].id
 
-  cluster_encryption_config = {}
+  cluster_encryption_config             = {}
   cluster_endpoint_private_access       = true
   cluster_endpoint_public_access        = true
   cluster_enabled_log_types             = ["api", "audit", "authenticator"]
@@ -20,38 +20,38 @@ module "eks_cluster" {
   # Remote access cannot be specified with a launch template
 
   eks_managed_node_group_defaults = {
-    ami_type               = "AL2_x86_64"
-    vpc_security_group_ids = [aws_security_group.eks.id]
+    ami_type                   = "AL2_x86_64"
+    vpc_security_group_ids     = [aws_security_group.eks.id]
     iam_role_attach_cni_policy = true
   }
 
 
-# manage_aws_auth_configmap             = true
-#  aws_auth_roles = [
-#    {
-#      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/foo"
-#      username = "system:node:{{EC2PrivateDNSName}}"
-#      groups   = ["system:masters"]
-#    }
-#  ]
+  # manage_aws_auth_configmap             = true
+  #  aws_auth_roles = [
+  #    {
+  #      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/foo"
+  #      username = "system:node:{{EC2PrivateDNSName}}"
+  #      groups   = ["system:masters"]
+  #    }
+  #  ]
 
   eks_managed_node_groups = {
-#    blue = {
-#
-#    }
+    #    blue = {
+    #
+    #    }
 
     green = {
-      min_size     = 1
-      max_size     = 4
-      desired_size = 3
+      min_size       = 1
+      max_size       = 4
+      desired_size   = 3
       instance_types = ["c6i.large"]
       #      capacity_type  = "SPOT"
       labels = var.tags
       taints = {
       }
       disk_size = 30
-      key_name = "kevin-poc-sgs-1"
-      tags    = var.tags
+      key_name  = "kevin-poc-sgs-1"
+      tags      = var.tags
     }
   }
 
@@ -64,7 +64,7 @@ module "lb_role" {
   attach_load_balancer_controller_policy = true
   oidc_providers = {
     main = {
-      provider_arn               = module.eks_cluster.oidc_provider
+      provider_arn               = module.eks_cluster.oidc_provider_arn
       namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
     }
   }
@@ -149,20 +149,20 @@ resource "helm_release" "lb" {
 }
 
 
-module "vpc_cni_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.0"
-  role_name_prefix      = "VPC-CNI-IRSA"
-  attach_vpc_cni_policy = true
-  vpc_cni_enable_ipv6   = true
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks_cluster.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-node"]
-    }
-  }
-  tags = var.tags
-}
+#module "vpc_cni_irsa" {
+#  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#  version = "~> 5.0"
+#  role_name_prefix      = "VPC-CNI-IRSA"
+#  attach_vpc_cni_policy = true
+#  vpc_cni_enable_ipv6   = true
+#  oidc_providers = {
+#    main = {
+#      provider_arn               = module.eks_cluster.oidc_provider_arn
+#      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+#    }
+#  }
+#  tags = var.tags
+#}
 
 
 module "eks-kubeconfig" {
@@ -178,42 +178,42 @@ module "eks-kubeconfig" {
 
 
 ## addon 不能一起添加，容易报错
- resource "aws_eks_addon" "addon-coredns" {
-   cluster_name                = module.eks_cluster.cluster_name
-   addon_name                  = "coredns"
-   addon_version               = "v1.10.1-eksbuild.1" #e.g., previous version v1.9.3-eksbuild.3 and the new version is v1.10.1-eksbuild.1
-    ## resolve_conflicts_on_update = "OVERWRITE"
-   tags = var.tags
-   # service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-   depends_on        = [module.eks_cluster]
- }
+resource "aws_eks_addon" "addon-coredns" {
+  cluster_name  = module.eks_cluster.cluster_name
+  addon_name    = "coredns"
+  addon_version = "v1.10.1-eksbuild.1" #e.g., previous version v1.9.3-eksbuild.3 and the new version is v1.10.1-eksbuild.1
+  ## resolve_conflicts_on_update = "OVERWRITE"
+  tags = var.tags
+  # service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
+  depends_on = [module.eks_cluster]
+}
 
 resource "aws_eks_addon" "vpc_cni" {
-  cluster_name      = module.eks_cluster.cluster_name
-  addon_name        = "vpc-cni"
-  addon_version     = "v1.12.6-eksbuild.2"
+  cluster_name  = module.eks_cluster.cluster_name
+  addon_name    = "vpc-cni"
+  addon_version = "v1.12.6-eksbuild.2"
 
   # resolve_conflicts_on_update = "OVERWRITE"
   tags = var.tags
   # service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-  depends_on        = [module.eks_cluster]
+  depends_on = [module.eks_cluster]
 }
 
 resource "aws_eks_addon" "kube_proxy" {
-  cluster_name      = module.eks_cluster.cluster_name
-  addon_name        = "kube-proxy"
+  cluster_name = module.eks_cluster.cluster_name
+  addon_name   = "kube-proxy"
   # resolve_conflicts_on_update = "OVERWRITE"
-  addon_version     = "v1.27.1-eksbuild.1"
-  tags = var.tags
+  addon_version = "v1.27.1-eksbuild.1"
+  tags          = var.tags
   # service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-  depends_on        = [module.eks_cluster]
+  depends_on = [module.eks_cluster]
 }
 
 
 #####
 #resource "null_resource" "kubectl" {
 #  provisioner "local-exec" {
-#    command = "aws eks --region ${var.region} update-kubeconfig --name ${local.cluster_name}"
+#    command = "aws eks --region ${aws.} update-kubeconfig --name ${local.cluster_name}"
 #  }
 #}
 #locals {

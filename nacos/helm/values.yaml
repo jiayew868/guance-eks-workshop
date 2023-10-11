@@ -49,12 +49,12 @@ persistence:
 
 
 service:
-  type: ClusterIP
-  #type: NodePort
+#  type: ClusterIP
+  type: NodePort
   port: 8848
-  nodePort: 30000
+#  nodePort: 30000
   labels:
-    env: fargate
+#    env: fargate
 
 ingress:
   enabled: false
@@ -64,12 +64,12 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internal
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/subnets: subnet-03275706fdd1badad,subnet-061b17a839a60623c
+    # alb.ingress.kubernetes.io/subnets: subnet-03275706fdd1badad,subnet-061b17a839a60623c
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: nacos.example.com
-      #paths: [ ]
+    - host:
+      paths: []
 
   tls: [ ]
   #  - secretName: chart-example-tls
