@@ -22,3 +22,10 @@ spring:
 #    path: /var/log/awsdemo/${spring.application.name}
 
 
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+

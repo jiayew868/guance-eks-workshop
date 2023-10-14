@@ -11,9 +11,20 @@ metadata:
   name: nacosdemo-config
   namespace: nacosdemo
 data:
-  DD_AGENT: "-javaagent:/usr/dd-java-agent/agent/dd-java-agent-1.19.1.jar -Ddd.agent.port=9529"
+  DD_AGENT: > 
+            -javaagent:/usr/dd-java-agent/agent/dd-java-agent-1.19.1.jar
+            -Ddd.profiling.enabled=true
+            -Ddd.logs.injection=true
+            -Ddd.jmxfetch.enabled=true
+            -Ddd.jmxfetch.check-period=1000
+            -Ddd.jmxfetch.statsd.port=8125
+            -Ddd.trace.health.metrics.enabled=true
+            -Ddd.trace.health.metrics.statsd.port=8125
+            -Ddd.agent.port=9529
   ##JAVA_OPTS2: "-Xms512m -Xmx1g"
-  JAVA_OPTS: "-Dspring.cloud.nacos.config.server-addr=nacos-cs.default.svc.cluster.local:8848 -Dspring.cloud.nacos.discovery.server-addr=nacos-cs.default.svc.cluster.local:8848"
+  JAVA_OPTS: >
+      -Dspring.cloud.nacos.config.server-addr=nacos-cs.default.svc.cluster.local:8848 
+      -Dspring.cloud.nacos.discovery.server-addr=nacos-cs.default.svc.cluster.local:8848
   envir: "prod"
   LOG_PATH: "/var/log/awsdemo/"
 

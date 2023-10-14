@@ -1,38 +1,4 @@
 
-
-create database guancedb;
-use guancedb;
-
-DROP TABLE IF EXISTS `T_User`;
-DROP TABLE IF EXISTS `T_User`;
-
-
-CREATE TABLE T_User (
-                        user_id INT AUTO_INCREMENT ,
-                        username VARCHAR(255) NOT NULL,
-                        email VARCHAR(255) NOT NULL,
-                        `create_time` datetime DEFAULT NULL,
-                        `update_time` datetime DEFAULT NULL,
-                        PRIMARY KEY (`user_id`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-# -----
-
-CREATE TABLE T_Order (
-                         order_id INT AUTO_INCREMENT,
-                         `user_id` INT NOT NULL,
-                         status VARCHAR(50) NOT NULL,
-                         order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         product_name VARCHAR(255) NOT NULL,
-                         product_price DECIMAL(10, 2) NOT NULL,
-                         product_quantity INT NOT NULL,
-                         `create_time` datetime DEFAULT NULL,
-                         `update_time` datetime DEFAULT NULL,
-                         PRIMARY KEY (`order_id`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
-# --test data
 INSERT INTO guancedb.T_User (user_id, username, email, create_time, update_time) VALUES (1, 'qbarron', 'prestondavid@example.net', '2020-09-10 03:34:53', '2021-03-16 11:42:57');
 INSERT INTO guancedb.T_User (user_id, username, email, create_time, update_time) VALUES (2, 'brandonmills', 'richard48@example.com', '2021-07-31 17:50:05', '2022-04-08 09:06:49');
 INSERT INTO guancedb.T_User (user_id, username, email, create_time, update_time) VALUES (3, 'vanessa72', 'tjohnson@example.net', '2023-07-25 22:06:00', '2022-09-03 06:55:47');

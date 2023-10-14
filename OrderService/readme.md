@@ -28,10 +28,13 @@ docker run \
     4，docker push 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/order_service:latest
     
 ### 部署Pod到EKS
-
+kubectl apply -f ./eks/order-service-deployment.yaml
 
 ### push public REPO
-
+    
+    aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/q1p2c6o9
+    docker tag awsdemo/order_service:latest public.ecr.aws/q1p2c6o9/awsdemo/order_service:latest
+    docker push public.ecr.aws/q1p2c6o9/awsdemo/order_service:latest
 
 ### Test API
 http://localhost:8082/order/{orderid}

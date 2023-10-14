@@ -163,7 +163,7 @@ resource "aws_security_group" "eks" {
 }
 
 // 创建一个允许SSH访问的安全组
-resource "aws_security_group" "ssh_sg" {
+resource "aws_security_group" "default_sg" {
   name_prefix = "guancewworkshop-remote-access"
   description = "Allow remote SSH access"
   vpc_id      = aws_vpc.main.id
@@ -176,6 +176,22 @@ resource "aws_security_group" "ssh_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "RDS access"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "redis access"
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -184,7 +200,7 @@ resource "aws_security_group" "ssh_sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = merge(var.tags, { Name = "ssh-remote" })
+  tags = merge(var.tags, { Name = "guanceworkshop_default_sg" })
 }
 
 // 创建一个MySQL数据库实例
@@ -196,10 +212,11 @@ resource "aws_db_instance" "database" {
   instance_class       = "db.t4g.medium"
   db_name              = "guancedb"
   username             = "admin"
-  password             = "password"
+  password             = "123425678"
   parameter_group_name = "default.mysql8.0"
   db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
   skip_final_snapshot  = true // 注意这是一个示例，生产环境可能需要适当的快照策略
+  vpc_security_group_ids = [aws_security_group.default_sg.id]
   tags                 = merge(var.tags, { Name = "guanceworkshop-db" })
 }
 
@@ -218,15 +235,17 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   num_cache_nodes      = 1
   port                 = 6379
   parameter_group_name = "default.redis7"
+  vpc_security_group_ids = [aws_security_group.default_sg.id]
   subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
 }
 
 // 创建cloud9
-#resource "aws_cloud9_environment_ec2" "cloud9" {
-#  instance_type = "t3.small"
-#  name          = "guance-env"
-#  subnet_id     = aws_subnet.public_subnet[0].id
-#  tags          = merge(var.tags)
-#}
+resource "aws_cloud9_environment_ec2" "cloud9" {
+  instance_type = "t3.small"
+  name          = "guance-env-1"
+  subnet_id     = aws_subnet.public_subnet[0].id
+  tags          = merge(var.tags)
+  
+}
 
 #terraform apply -auto-approve | grep "eks_alb_address\|rds_endpoint\|redis_endpoint"

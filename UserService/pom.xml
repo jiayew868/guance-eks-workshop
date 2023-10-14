@@ -163,7 +163,7 @@
                         </exclude>
                     </excludes>
                     <includeSystemScope>true</includeSystemScope>
-                    <mainClass>org.awsdemo.user.Main</mainClass>
+                    <mainClass>com.awsdemo.user.Main</mainClass>
                     <layout>JAR</layout>
                 </configuration>
             </plugin>

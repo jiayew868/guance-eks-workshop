@@ -197,7 +197,7 @@
                         </exclude>
                     </excludes>
                     <includeSystemScope>true</includeSystemScope>
-                    <mainClass>org.awsdemo.order.Main</mainClass>
+                    <mainClass>com.awsdemo.order.Main</mainClass>
                     <layout>JAR</layout>
                 </configuration>
             </plugin>

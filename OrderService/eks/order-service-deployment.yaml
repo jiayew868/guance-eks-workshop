@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/order_service:latest
+#          image: 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/order_service:latest
+          image: public.ecr.aws/q1p2c6o9/awsdemo/order_service:latest
           ports:
             - containerPort: 8082
           resources:
@@ -57,3 +58,22 @@ spec:
         - name: log-path
           hostPath:
             path: /var/log/
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: nacosdemo
+  labels:
+    app: order-service
+spec:
+  ports:
+    - name: http
+      port: 8082
+      protocol: TCP
+      targetPort: 8082
+  selector:
+    app: order-service
+  #  type: ClusterIP
+  type: NodePort

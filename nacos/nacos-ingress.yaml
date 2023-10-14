@@ -8,6 +8,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/healthcheck-path: /nacos/index.html
 #    alb.ingress.kubernetes.io/subnets: subnet-0d3e50ed82a416715,subnet-0a0fa8cb44e896918
 spec:
   ingressClassName: alb
