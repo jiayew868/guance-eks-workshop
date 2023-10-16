@@ -1,8 +1,6 @@
 
 
 ### 镜像打包
-docker build --build-arg JAR_FILE=./target/UserService-1.0.jar -t awsdemo/user_service .
-
 docker build --build-arg JAR_FILE=UserService-1.0.jar -t awsdemo/user_service -f Dockerfile ../
 
 
@@ -28,6 +26,17 @@ awsdemo/user_service:latest
     4，docker push 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/user_service:latest
 
 
+### 提交共有ECR
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/q1p2c6o9
+
+docker tag awsdemo/user_service:latest public.ecr.aws/q1p2c6o9/awsdemo/user_service:latest
+docker push public.ecr.aws/q1p2c6o9/awsdemo/user_service:latest
+
+
 ### Test API
 http://localhost:8081/user/all
 http://localhost:8081/user/1/user-orders
+
+
+
+[dd.trace 2023-10-14 16:54:40:968 +0000] [OkHttp http://10.0.3.129:9529/...] WARN com.datadog.profiling.uploader.ProfileUploader - Failed to upload profile to http://10.0.3.129:9529/profiling/v1/input java.net.ConnectException: Failed to connect to /10.0.3.129:9529 (Will not log errors for 5 minutes)

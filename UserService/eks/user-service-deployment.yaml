@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: 700951776385.dkr.ecr.cn-northwest-1.amazonaws.com.cn/awsdemo/user_service:latest
+          image: public.ecr.aws/q1p2c6o9/awsdemo/user_service:latest
           ports:
             - containerPort: 8081
           resources:
@@ -56,3 +56,22 @@ spec:
         - name: log-path
           hostPath:
             path: /var/log/
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: nacosdemo
+  labels:
+    app: user-service
+spec:
+  ports:
+    - name: http
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: user-service
+  #  type: ClusterIP
+  type: NodePort

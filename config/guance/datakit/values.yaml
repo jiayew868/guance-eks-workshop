@@ -1,7 +1,7 @@
 MetricsServerEnabled: false
 datakit:
   dataway_url: https://aws-openway.guance.com?token=tkn_cef8ee496b014cd4a59b1b470a9c0679
-  default_enabled_inputs: dk,cpu,disk,diskio,mem,swap,system,hostobject,net,host_processes,container,ebpf,rum,statsd,profile
+  default_enabled_inputs: dk,cpu,disk,diskio,mem,swap,system,hostobject,net,host_processes,container,ebpf,rum,statsd,profile,ddtrace
   enabled_election: true
   global_tags: host=__datakit_hostname,host_ip=__datakit_ip，cluster_name_k8s=guance_workshop
   http_listen: 0.0.0.0:9529

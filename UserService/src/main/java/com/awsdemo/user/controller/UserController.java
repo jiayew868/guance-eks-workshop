@@ -39,7 +39,7 @@ public class UserController {
 
     @GetMapping("/hello")
     public String hello () {
-        String value = String.format("%s,%s" , "user","1111");
+        String value = String.format("hello %s,%s" , "user","xiaoli");
         logger.info(value);
         return value;
     }
@@ -75,9 +75,22 @@ public class UserController {
     @GetMapping(value = "/all")
     public List<User> getALL(){
         User user = new User();
-        return Lists.newArrayList();
-        //return user.selectAll();
+       // return Lists.newArrayList();
+        return user.selectAll();
     }
 
+
+    public void oom (){
+        List<byte[]> list = new ArrayList<>();
+        try {
+            while (true) {
+                byte[] data = new byte[1048576]; // 分配1MB的内存
+                list.add(data);
+            }
+        } catch (OutOfMemoryError e) {
+            logger.error("OutOfMemoryError caught!");
+            e.printStackTrace();
+        }
+    }
 
 }

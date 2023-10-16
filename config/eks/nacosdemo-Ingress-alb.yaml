@@ -11,8 +11,8 @@ metadata:
 #    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:region:account-id:certificate/certificate-id  # SSL 证书的 ARN
 #    alb.ingress.kubernetes.io/ssl-policy: ELBS如果您想在AWS EKS中使用AWS Application Load Balancer (ALB)作为Ingress Controller，可以使用以下的Ingress配置文件。请确保您已经安装并配置了AWS ALB Ingress Controller，否则此配置将无法正常工作。
     kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/healthcheck-path: /check/health
-    alb.ingress.kubernetes.io/subnets: subnet-03275706fdd1badad, subnet-061b17a839a60623c
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+#    alb.ingress.kubernetes.io/subnets: subnet-03275706fdd1badad, subnet-061b17a839a60623c
 spec:
   ingressClassName: alb
   rules:
