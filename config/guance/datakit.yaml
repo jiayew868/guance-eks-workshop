@@ -149,7 +149,7 @@ spec:
         - name: ENV_IPDB
           value: iploc
         # # ---iploc-end
-        image: pubrepo.jiagouyun.com/datakit/datakit:1.15.1
+        image: pubrepo.jiagouyun.com/datakit/datakit:1.16.1
         imagePullPolicy: Always
         name: datakit
         ports:

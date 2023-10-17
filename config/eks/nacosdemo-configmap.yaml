@@ -21,7 +21,6 @@ data:
             -Ddd.jmxfetch.statsd.port=8125          
             -Ddd.trace.health.metrics.enabled=true
             -Ddd.trace.health.metrics.statsd.port=8125
-            -Ddd.jmxfetch.statsd.host=datakit-service.datakit.svc
             -Ddd.agent.port=9529
   ##JAVA_OPTS2: "-Xms512m -Xmx1g"
   JAVA_OPTS: >

@@ -213,6 +213,7 @@ resource "aws_db_instance" "database" {
   instance_class       = "db.t4g.medium"
   db_name              = "guancedb"
   username             = "admin"
+
   password             = "123425678"
 
   parameter_group_name = "default.mysql8.0"
