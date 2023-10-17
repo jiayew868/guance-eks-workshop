@@ -58,6 +58,7 @@ resource "aws_subnet" "public_subnet" {
   availability_zone = count.index % 2 == 0 ? "ap-southeast-1a" : "ap-southeast-1b"
 
 
+
   tags = merge(var.tags, {
     Name                                          = "public-subnet-${count.index + 1}"
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"

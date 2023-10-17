@@ -8,7 +8,7 @@ fake = Faker()
 # 连接到MySQL数据库
 connection = mysql.connector.connect(
     host="localhost",
-    user="root",
+    user="admin",
     password="123456",
     database="guancedb"  # 替换为您的数据库名称
 )

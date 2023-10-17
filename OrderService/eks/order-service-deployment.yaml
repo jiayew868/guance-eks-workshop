@@ -50,7 +50,7 @@ spec:
                   -Ddd.jmxfetch.enabled=true
                   -Ddd.jmxfetch.check-period=1000 
                   -Ddd.jmxfetch.statsd.port=8125
-                  -Ddd.jmxfetch.statsd.host=datakit.datakit.svc
+                  -Ddd.jmxfetch.statsd.host=datakit-service.datakit.svc
                   -Ddd.profiling.enabled=true 
                   -Ddd.profiling.allocation.enabled=true
                   -Duser.timezone=GMT+8

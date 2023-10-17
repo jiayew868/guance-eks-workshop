@@ -5,7 +5,7 @@ metadata:
   namespace: ruoyi
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing  # 指定 Load Balancer 方案，可以是 internet-facing 或 internal
-    alb.ingress.kubernetes.io/target-type: ip         # 指定后端服务的类型，可以是 instance 或 ip
+    alb.ingress.kubernetes.io/target-type: instance         # 指定后端服务的类型，可以是 instance 或 ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'  # 监听端口，这里设置为80端口
 #    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": {"Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'  # 开启重定向到HTTPS
 #    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:region:account-id:certificate/certificate-id  # SSL 证书的 ARN
