@@ -214,6 +214,7 @@ resource "aws_db_instance" "database" {
   db_name              = "guancedb"
   username             = "admin"
   password             = "123425678"
+
   parameter_group_name = "default.mysql8.0"
   db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
   skip_final_snapshot  = true // 注意这是一个示例，生产环境可能需要适当的快照策略

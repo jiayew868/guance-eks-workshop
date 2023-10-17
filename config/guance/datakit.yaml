@@ -110,15 +110,15 @@ spec:
               apiVersion: v1
               fieldPath: spec.nodeName
         - name: ENV_DATAWAY
-          value: https://openway.guance.com?token=<token>
+          value: https://aws-openway.guance.com?token=tkn_cef8ee496b014cd4a59b1b470a9c0679
         - name: ENV_GLOBAL_TAGS
-          value: host=__datakit_hostname,host_ip=__datakit_ip,cluster_name_k8s=k8s-demo
+          value: host=__datakit_hostname,host_ip=__datakit_ip,cluster_name_k8s=guance-eks-cluster
         - name: ENV_NAMESPACE
-          value: k8s-demo
+          value: guance_workshop
         - name: ENV_GLOBAL_ELECTION_TAGS
-          value: cluster_name_k8s=k8s-demo
+          value: cluster_name_k8s=guance-eks-cluster
         - name: ENV_DEFAULT_ENABLED_INPUTS
-          value: cpu,disk,diskio,mem,swap,system,hostobject,net,host_processes,container,ebpf,rum,statsd,profile
+          value: cpu,disk,diskio,mem,swap,system,hostobject,net,host_processes,container,ebpf,rum,statsd,profile,ddtrace
         - name: ENV_ENABLE_ELECTION
           value: enable
         - name: ENV_LOG
@@ -427,13 +427,18 @@ data:
   logging.conf: |-
     [[inputs.logging]]
       logfiles = [
-        "/data/logs/**/*.log",
+        "/var/log/*",                          # 文件路径下所有文件
+        "/var/log/sys*",                       # 文件路径下所有以 sys 前缀的文件
+        "/var/log/syslog",                     # Unix 格式文件路径
+        "/var/log/*",                          # 文件路径下所有文件
+        "/var/log/sys*",                       # 文件路径下所有以 sys 前缀的文件
+        "/var/log/awsdemo/*"                     #demo 日志路径
       ]
 
       ignore = [""]
 
       # 数据来源，如果为空，则默认使用 'default'
-      source = "ruoyi-log"
+      source = ""
 
       # 新增标记tag，如果为空，则默认使用 $source
       service = ""
