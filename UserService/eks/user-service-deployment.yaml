@@ -48,7 +48,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: nacosdemo-config
-
           volumeMounts:
             - name: log-path
               mountPath: /var/log/

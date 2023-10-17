@@ -3,7 +3,7 @@ annotations:
   catalog.cattle.io/display-name: DataKit
   catalog.cattle.io/release-name: datakit
 apiVersion: v2
-appVersion: 1.13.1
+appVersion: 1.16.1
 dependencies:
 - condition: kubeStateMetricsEnabled
   name: kube-state-metrics
