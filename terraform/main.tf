@@ -235,7 +235,7 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   num_cache_nodes      = 1
   port                 = 6379
   parameter_group_name = "default.redis7"
-  vpc_security_group_ids = [aws_security_group.default_sg.id]
+  security_group_ids = [aws_security_group.default_sg.id]
   subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
 }
 
