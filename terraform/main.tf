@@ -206,22 +206,42 @@ resource "aws_security_group" "default_sg" {
 
 // 创建一个MySQL数据库实例
 resource "aws_db_instance" "database" {
-  allocated_storage    = 30
-  storage_type         = "gp3"
-  engine               = "mysql"
-  engine_version       = "8.0.33"
-  instance_class       = "db.t4g.medium"
-  db_name              = "guancedb"
-  username             = "admin"
+  allocated_storage = 30
+  storage_type      = "gp3"
+  engine            = "mysql"
+  engine_version    = "8.0.33"
+  instance_class    = "db.t4g.medium"
+  db_name           = "guancedb"
+  username          = "admin"
 
-  password             = "123425678"
+  password = "123425678"
 
-  parameter_group_name = "default.mysql8.0"
-  db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
-  skip_final_snapshot  = true // 注意这是一个示例，生产环境可能需要适当的快照策略
+  parameter_group_name   = "default.mysql8.0"
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
+  skip_final_snapshot    = true // 注意这是一个示例，生产环境可能需要适当的快照策略
   vpc_security_group_ids = [aws_security_group.default_sg.id]
-  tags                 = merge(var.tags, { Name = "guanceworkshop-db" })
+  tags                   = merge(var.tags, { Name = "guanceworkshop-db" })
 }
+
+
+resource "aws_db_instance" "database2" {
+  allocated_storage = 30
+  storage_type      = "gp3"
+  engine            = "mysql"
+  engine_version    = "8.0.33"
+  instance_class    = "db.t4g.medium"
+  db_name           = "guancedb"
+  username          = "admin"
+  password = "123425678"
+  parameter_group_name   = "default.mysql8.0"
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
+  skip_final_snapshot    = true // 注意这是一个示例，生产环境可能需要适当的快照策略
+  vpc_security_group_ids = [aws_security_group.default_sg.id]
+  tags                   = merge(var.tags, { Name = "guanceworkshop-db" })
+}
+
+
+
 
 // 创建ElastiCache子网组
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
@@ -238,7 +258,7 @@ resource "aws_elasticache_cluster" "redis_cluster" {
   num_cache_nodes      = 1
   port                 = 6379
   parameter_group_name = "default.redis7"
-  security_group_ids = [aws_security_group.default_sg.id]
+  security_group_ids   = [aws_security_group.default_sg.id]
   subnet_group_name    = aws_elasticache_subnet_group.redis_subnet_group.name
 }
 
@@ -248,7 +268,7 @@ resource "aws_cloud9_environment_ec2" "cloud9" {
   name          = "guance-env-1"
   subnet_id     = aws_subnet.public_subnet[0].id
   tags          = merge(var.tags)
-  
+
 }
 
 #terraform apply -auto-approve | grep "eks_alb_address\|rds_endpoint\|redis_endpoint"
