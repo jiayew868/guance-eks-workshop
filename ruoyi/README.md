@@ -23,7 +23,7 @@ helm upgrade -i ruoyi -n ruoyi --create-namespace ./deployment/helm
 - `GUANCE_REGION`: 观测云 region，可选项：
 
 ```shell
-cd guance-java-ruoyi-demo/terraform
+cd ruoyi/terraform
 export GUANCE_ACCESS_TOKEN=xxx
 export GUANCE_REGION=xxx
 terraform init
