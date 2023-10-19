@@ -7,7 +7,7 @@
 ***
 
 ## 方式一：Helm 方式手动安装
-> 通过 Helm 安装至 Kubernetes 集群，适合快速安装 guance-java-ruoyi-demo 进行演示的场景。
+> 通过 Helm 安装至 Kubernetes 集群，适合快速安装 ruoyi-demo 进行演示的场景。
 
 ### 1. 安装
 #### 1.1 执行安装
