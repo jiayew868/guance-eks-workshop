@@ -2,7 +2,7 @@
 ***
 
 ## 前提条件
-[安装 DataKit Operator 和 DataKit](https://github.com/GuanceDemo/guance-datakit-demo)
+安装 DataKit Operator 和 DataKit
 
 ***
 
