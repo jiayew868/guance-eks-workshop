@@ -114,7 +114,7 @@ spec:
                   apiVersion: v1
                   fieldPath: spec.nodeName
             - name: ENV_DATAWAY
-              value: https://aws-openway.guance.com?token=tkn_cef8ee496b014cd4a59b1b470a9c0679
+              value: https://aws-openway.guance.com?token=tkn_cef8ee496b014cd4a59b1b470a9c0679-1
             - name: ENV_GLOBAL_TAGS
               value: host=__datakit_hostname,host_ip=__datakit_ip,cluster_name_k8s=k8s-demo
             - name: ENV_NAMESPACE
@@ -153,7 +153,7 @@ spec:
             - name: ENV_IPDB
               value: iploc
           # # ---iploc-end
-          image: pubrepo.jiagouyun.com/datakit/datakit:1.15.1
+          image: pubrepo.jiagouyun.com/datakit/datakit:1.16.1
           imagePullPolicy: Always
           name: datakit
           ports:
