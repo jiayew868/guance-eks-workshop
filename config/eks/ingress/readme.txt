@@ -6,7 +6,6 @@ eksctl utils associate-iam-oidc-provider --approve --cluster ${CLUSTER_NAME}  --
 
 curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.7/docs/install/iam_policy_cn.json
 
-
 aws iam create-policy \
     --policy-name AWSLoadBalancerControllerIAMPolicy \
     --policy-document file://iam_policy_cn.json \
@@ -20,9 +19,7 @@ eksctl create iamserviceaccount \
   --role-name AmazonEKSLoadBalancerControllerRole_${CLUSTER_NAME} \
   --attach-policy-arn=arn:aws-cn:iam::700951776385:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve \
-  --profile zhy
-
-
+  --profile zhy \
    --override-existing-serviceaccounts \
 
 kubectl apply -f rbac-role.yaml --cluster=eks-workshop02.cn-northwest-1.eksctl.io
@@ -38,6 +35,9 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set region=${AWS_REGION} \
   --set vpcId=vpc-007a957cbd15fead9 \
   --set serviceAccount.name=aws-load-balancer-controller
+
+echo "parameters:
+  type: gp3" >> specs/storageclass.yaml
 
 
 kubectl get deployment -n kube-system aws-load-balancer-controller --cluster=eks-workshop02.cn-northwest-1.eksctl.io

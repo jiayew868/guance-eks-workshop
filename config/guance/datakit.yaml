@@ -114,7 +114,7 @@ spec:
                   apiVersion: v1
                   fieldPath: spec.nodeName
             - name: ENV_DATAWAY
-              value: https://aws-openway.guance.com?token=tkn_cef8ee496b014cd4a59b1b470a9c0679-1
+              value: https://aws-openway.guance.com?token=tkn_cef8ee496b014cd4a59b1b470a9c0679-1 # 请输入正确的guance token
             - name: ENV_GLOBAL_TAGS
               value: host=__datakit_hostname,host_ip=__datakit_ip,cluster_name_k8s=k8s-demo
             - name: ENV_NAMESPACE
