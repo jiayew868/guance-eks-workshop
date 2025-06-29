@@ -36,9 +36,20 @@ module "eks_cluster" {
   #  ]
 
   eks_managed_node_groups = {
-    #    blue = {
-    #
-    #    }
+#        blue = {
+#          min_size       = 1
+#          max_size       = 3
+#          desired_size   = 3
+#          instance_types = ["c6i.2xlarge"]
+#          #      capacity_type  = "SPOT"
+#          labels = var.tags
+#          taints = {
+#          }
+#          disk_size = 30
+#          key_name  = "kevin-poc-sgs-1"
+#          tags      = var.tags
+#
+#        }
 
     green = {
       min_size       = 1

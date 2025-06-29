@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-claim
+  annotations:
+    "ebs.csi.aws.com/volumeType": "gp3"
+    "ebs.csi.aws.com/iops": "5000"
+    "ebs.csi.aws.com/throughput": "250"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc-gp3
+  resources:
+    requests:
+      storage: 4Gi

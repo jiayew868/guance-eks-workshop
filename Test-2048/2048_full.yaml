@@ -29,7 +29,7 @@ spec:
         - containerPort: 80
         resources:
             requests:
-              cpu: '0.5'
+              cpu: '1'
               memory: '200Mi'
             limits:
               memory: '200Mi'
@@ -57,9 +57,11 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-
     kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/subnets: subnet-0d43a6ba8de6bcea9,subnet-0db247b8d1ef1f26d
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:964479626419:certificate/2c96c837-d378-4771-b0da-cc2add1d37d8
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/subnets: subnet-0bfe7739a0942a4af,subnet-008a67adc08e6658c
 spec:
   ingressClassName: alb
   rules:
